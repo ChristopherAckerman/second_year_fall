@@ -1,0 +1,188 @@
+\documentclass{beamer}
+\input{../slides_preamble}
+
+\begin{document}
+\begin{frame}{Research Question}
+  \begin{itemize}
+  \item  Effects of enforcing existing regulation in India
+    \vfill
+  \item Currently a bunch of firms flout international patent law; what happens if we enforce the law?
+    \vfill
+  \item Reduced competition: Patent protection gives firms market power
+    \vfill
+  \item What will the firms do with this market power?
+    \vfill
+    \item Will it hurt consumers?
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Approach}
+  \begin{itemize}
+  \item Estimate Demand system for Quinalones (class of drugs) in India; need to estimate demand elasticities for this
+    \vfill
+  \item Product approach: define drugs along two dimensions
+    \begin{enumerate}
+    \item Molecule
+      \item Producer nationality (foreign vs. domestic)
+    \end{enumerate}
+    \vfill
+  \item Bound counterfactuals with two extreme cases
+    \begin{enumerate}
+    \item Perfect competition; $c_i^U = p_i$
+      \item Perfect collusion; $c_i^L = p_i \cdot \left(1 + \frac{1}{\varepsilon_{ii}(p_i p_j)}\right) $
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Demand (Upper Stage)}
+  \begin{itemize}
+  \item AIDS model of demand; two-step choice
+    \vfill
+  \item In the first stage, allocate spending across categories of drugs:
+    \begin{equation}
+      \label{eq:1}
+    \hspace{-4em} \omega_{Grt} = \alpha_G + \alpha_{Gr} + \sum_H \gamma_{GH} \ln P_{Hrt} + \beta_G \ln \left(\frac{X_{rt}}{P_{rt}}\right) + \varepsilon_{Grt} \tag{Upper Stage}
+    \end{equation}
+    \vfill
+    \item Authors include $r$ subscripts to allow different prices in each region 
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Demand (Lower Level)}
+  \begin{itemize}
+  \item In the second step, consumers choose a product, and each product is defined by its molecule and its manufacturer (foreign vs domestic.
+  \end{itemize}
+  \begin{align*}
+    \omega_{irt} &= \alpha_i + \alpha_{ir} \\
+                 &\ + \underbrace{\gamma_{ii} \ln  p_{irt}}_{\text{own price}} + \overbrace{\gamma_{i, 10} \ln p_{jrt, j = D_i^{10}}}^{\text{same molecule; different country}}\\
+                 &\ + \underbrace{\sum_{j \in D_i^{01}}[\gamma_{i, 01} \ln p_{jrt}]}_{\text{different molecule; same country}} + \underbrace{\sum_{j \in D_i^{00}}[\gamma_{i, 00} \ln p_{jrt}]}_{\text{different molecule, different country}}\\
+    &\ + \beta_i \ln \left(\frac{X_{Qrt}}{P_{Qrt}}\right) + \varepsilon_{irt} %\tag{Lower Level}
+  \end{align*}
+\end{frame}
+%
+\begin{frame}{Estimation}
+  \begin{itemize}
+  \item The authors can't use OLS
+    \begin{enumerate}
+    \item \emph{Not} worried about endogeneity (because price controls screw up the firm's FOCs anyway)
+      \item \emph{Are} worried about measurement error
+    \end{enumerate}
+    \vfill
+  \item Construct an ``approximate'' price index (with measurement error)
+    \vfill
+  \item Instruments must be
+    \begin{enumerate}
+    \item Correlated with the true price index, $p_j^A$
+      \item Uncorrelated with error term $\varepsilon_i$
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Instruments}
+  \begin{itemize}
+  \item Authors use SKU prices as instruments for the price index
+    \vfill
+  \item I'm not sure if I believe them\ldots They even mention that, if new SKUs indicate improving quality, etc. then their instruments might be correlated with the error term (thoughts?)
+    \vfill
+  \item List of instruments:
+    \begin{enumerate}
+    \item Number of SKUs in each group
+    \item Prices of the five largest SKUs in each group
+      \item All exogenous variables
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Counterfactual}
+  \begin{itemize}
+  \item Remove different numbers of domestic drugs
+    \vfill
+  \item Assume the foreign firm(s) have monopoly power
+    \begin{itemize}
+    \item Either full monopolists, or facing price constraints, depending on scenario
+    \end{itemize}
+    \vfill
+  \item Calculate the price the new monopolist would charge (potentially subject to constraints)
+    \vfill
+    \item Welfare analysis
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Findings}
+  \begin{itemize}
+  \item Full model helps with counterfactual substitution patterns
+    \vfill
+  \item ``Welfare'' is Consumer Surplus $+$ Firm Profits
+    \vfill
+  \item Welfare changes measured as Compensating Variation
+    \vfill
+  \item Three driving forces
+    \begin{enumerate}
+    \item Lost variety
+    \item Expenditure switching
+      \item Reduced competition
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Findings}
+  \begin{itemize}
+  \item  Domestic products are very good substitutes for each other
+    \vfill
+  \item Most of the welfare changes ($>80\%$) are due to lost consumer welfare
+    \vfill
+  \item Authors claim that this is likely due to lost ``variety''
+    \begin{itemize}
+    \item Domestic products have more different types (dosage/pill, pills/bottle, etc.)
+      \item Domestic products also have better distribution networks; more readily available at local pharmacies
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Critique}
+  \begin{itemize}
+  \item The competition on the supply side seems a bit suspect
+    \vfill
+  \item If ``variety'' or ``distribution network'' is an important aspect of consumer choice, those product attributes should be in the model somewhere
+    \vfill
+  \item I don't think that ``foreign vs. domestic'' does a good enough job capturing this
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Proposed Counterfactual}
+  \begin{itemize}
+  \item Firms have two choice variables:
+    \begin{enumerate}
+    \item Price
+      \item Quality
+    \end{enumerate}
+    \vfill
+  \item In addition to a $p_i$ estimate, firms have another parameter in their decision, $v_i$
+    \begin{itemize}
+    \item This is the price of producing ``variety''; think of it as the cost of establishing a distribution network
+      \begin{itemize}
+      \item (Naturally domestic firms would be able to establish a widespread distribution network more cheaply)
+      \end{itemize}
+    \end{itemize}
+    \vfill
+    \item Firms now choose a pair $\{p_i, N_i\}$, where $N_i$ is the size of their distribution network, produced at a cost of $N(v_i)$
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{What might happen?}
+  \begin{itemize}
+  \item Given the existing competition, foreign firms might not find it profitable to invest in their (expensive) distribution network
+    \vfill
+  \item However, given the regulation, they may then find it profitable to invest in a large distribution network, potentially as large or larger than the existing domestic networks (economies of scale)
+    \vfill
+  \item This dynamic supply-side response will restore a lot of the ``variety'' driving the welfare losses in the original counterfactual
+    \vfill
+    \item I saw this dynamic supply-side model in \emph{Neilson, Allende and Gallego} (2019)
+  \end{itemize}
+\end{frame}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

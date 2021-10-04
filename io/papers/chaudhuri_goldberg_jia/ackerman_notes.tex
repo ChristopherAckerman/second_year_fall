@@ -1,0 +1,44 @@
+\input{../../article_preamble.tex}
+
+\begin{document}
+\section{Demand}
+\begin{itemize}
+\item Uses AIDS (Deaton and Muellbauer; should read at some point)
+\item Two-step nested choice model; doesn't impose any restrictions on cross-price elasticties.
+\item Estimating Equations:
+  \begin{equation}
+    \omega_{Grt} = \alpha_G + \alpha_{Gr} + \sum_H \gamma_{GH} \ln P_{Hrt} + \beta_G \ln \left(\frac{X_{rt}}{P_{rt}}\right) + \varepsilon_{Grt} \tag{Upper Stage}
+  \end{equation}
+  At the lower level, we have
+  \begin{equation*}
+  \hspace{-8em}  \omega_{irt} = \alpha_i + \alpha_{ir} + \underbrace{\gamma_{ii} \ln  p_{irt}}_{\text{own price}} + \underbrace{\gamma_{i, 10} \ln p_{jrt, j = D_i^{10}}}_{\text{same molecule; different country}} + \underbrace{\sum_{j \in D_i^{01}}[\gamma_{i, 01} \ln p_{jrt}]}_{\text{different molecule; same country}} + \underbrace{\sum_{j \in D_i^{00}}[\gamma_{i, 00} \ln p_{jrt}]}_{\text{different molecule, different country}} + \beta_i \ln \left(\frac{X_{Qrt}}{P_{Qrt}}\right) + \varepsilon_{irt} %\tag{Lower Level}
+  \end{equation*}
+\item The authors estimate this with IV and OLS; IV is the right way to do it but they also confirm that OLS doesn't give \emph{crazy} results.
+\item \rd{Add table of instruments and estimation}
+  \item These parameters, somehow (due to AIDS?) give us the elasticity of demand \rd{Check the AIDS algebra for this and check with classmates}
+\end{itemize}
+
+\section{Supply}
+\begin{itemize}
+\item In order to do anything interesting, we need to know MC but we don't observe it.
+\item The usual approach in IO is to exploit firms' equilibrium conditions; general sketch:
+  \begin{enumerate}
+  \item Assume something about $MC_i$ for firms $i$
+  \item Assume something about the competition structure (oligopoly market; compete via Bertrand)
+  \item Assume something about firm behavior (period-by-period profit maximization)
+    \item Derive first-order-conditions for firms
+  \end{enumerate}
+  \item The authors can't do this, even as a constrained optimization problem, because the existing price regulations make this too difficult. \rd{Why?}
+  \item Instead the authors do an exercise to bound marginal prices; two extreme assumptions for an upper and lower bound:
+    \begin{enumerate}
+    \item Perfect competition $\implies$ highest marginal cost $\implies c_i^U = p_i$
+      \item Perfect collusion $\approx$ monopoly $\implies$ lowest marginal cost $\implies c_i^L = p_i \cdot \left(1 + \frac{1}{\varepsilon_{ii}(p_i p_j)}\right)$
+    \end{enumerate}
+    \item Most of the exercises in the paper use the lower bound, since this represents the largest potential losses for firms under TRIPS (most to lose from patent enforcement)
+\end{itemize}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

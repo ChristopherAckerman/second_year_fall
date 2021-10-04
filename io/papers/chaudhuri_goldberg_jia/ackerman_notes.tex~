@@ -1,0 +1,10 @@
+\input{../../article_preamble.tex}
+
+\begin{document}
+Hello World
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
