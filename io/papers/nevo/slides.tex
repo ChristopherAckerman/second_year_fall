@@ -1,0 +1,193 @@
+\documentclass[dvipsnames]{beamer}
+\input{../slides_preamble}
+
+\begin{document}
+% \maketitle
+\begin{frame}{Overview}
+  \begin{itemize}
+  \item Are RTE cereal firms colluding?
+    \begin{itemize}
+    \item Existing evidence says probably yes (FTC case in the 1970s; Schmalensee 1978)
+    \end{itemize}
+    \vitem Consumers spend $\sim 9$B/year on cereal (wow) and firms make $\sim 3$B in profits 
+\vitem Nevo models demand for cereals, then tests different market structures for suppliers to see which most closely matches the data
+% \item Needs to use a more flexible model than logit to accurately model substitution patterns
+  % \begin{itemize}
+  % \item We think that Lucky Charms and Froot Loops are closer substitutes than Raisin Bran and Froot Loops
+  % \end{itemize}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Why do we think RTE firms are colluding?}
+  \begin{center}
+ \includegraphics[width=.8\textwidth, keepaspectratio=true]{tab1.png} 
+ \\
+ \includegraphics[width=.8\textwidth, keepaspectratio=true]{tab2.png} 
+ \end{center}
+\end{frame}
+\begin{frame}{Approach (Supply)}
+  \begin{itemize}
+  \item Trying to answer the question ``Are RTE cereal firms colluding?''
+  \vitem We know that there are different FOCs for different models of supply.
+  \vitem Essentially the question is ``Can we reject that firms are acting like profit-maximizing colluders?''
+  \vitem Can write FOCs as
+    \[
+      s_j (p) + \gr{\sum_{r \in \mathcal{F}_f}} (p_r - mc_r) \frac{\partial s_r(p)}{\partial p_j} = 0.
+\]
+\item The important bit is $\gr{\sum_{r \in \mathcal{F}_f}}$; firms are only looking at the products that they produce, and this is what's changing when we look at different supply side models.
+  \end{itemize}
+ \end{frame}
+ %
+ \begin{frame}{Approach (Supply)}
+   \begin{itemize}
+   \item Demand estimates let us estimate price-cost margins without seeing costs.
+     \item Look at three different models for the supply side
+     \begin{enumerate}
+     \item Single-product firms
+       \item Multi-product firms (existing structure)
+       \item Monopoly/perfect price collusion
+     \end{enumerate}
+   \vitem Looking at these three different models of supply lets us distinguish between three different causes of markups:
+     \begin{enumerate}
+     \item Product Differentiation
+       \item Portfolio effect
+       \item Price collusion
+     \end{enumerate}
+   \end{itemize}
+ \end{frame}
+% 
+ \begin{frame}{Approach (Demand)}
+   \begin{itemize}
+   \item The exercise on the supply-side depends on own- and cross-price elasticities; we need to estimate these.
+   \item Consumer Utility:
+     \begin{align*}
+       u_{ijt} &= \underbrace{\delta_{jt}(x_j, p_{jt}, \xi_{jt}; \theta_1)}_{\text{mean utility}} + \underbrace{\mu_{ijt}(x_j, p_{jt}, \nu_j, D_i; \theta_2) + \epsilon_{ijt}}_{\text{mean-zero deviation}} \\
+       \delta_{jt} &= x_j \beta - \alpha p_{jt} + \xi_{j} +\Delta \xi_{jt}\\
+       \mu_{ijt} &= [p_{jt}, x_j]^\prime \ast (\Pi D_i + \Sigma \nu_i)\\
+       \intertext{Need to get shares; define $A_{jt}$ as the  unobserved variables that lead consumer to choose $j$. Calculate shares as}
+       s_{jt}(x, p_{.t}, \delta_{.t}; \theta_2) &= \int_{A_{jt}} dP^\ast (D, \nu, \varepsilon)\\
+       &= \int_{A_{jt}} dP^\ast(\varepsilon) dP^\ast(\nu)dP^\ast(D)
+     \end{align*}
+   \end{itemize}
+ \end{frame}
+ %
+ \begin{frame}{Logit vs. Nevo}
+   \begin{itemize}
+   \item Don't want to use Logit, since that imposes restrictions on substitution patterns. (Ditto m-logit, etc.)
+     \vitem What's different? Composite random shock $\mu_{ijt} + \varepsilon_{ijt}$ no longer independent of product characteristics, so substitution patterns can be driven by these characteristics
+     \vitem Also doesn't impose arbitrary market segmentation.
+   \end{itemize}
+ \end{frame}
+ %
+ \begin{frame}{Estimation---Data}
+   \begin{enumerate}
+   \item Market shares and prices in each market
+     \begin{itemize}
+     \item A market is a city-quarter
+     \end{itemize}
+     \vitem Brand characteristics
+     \vitem Advertising
+     \vitem The distribution of demographics
+   \end{enumerate}
+ \end{frame}
+ %
+ \begin{frame}{Differences with BLP}
+   \begin{enumerate}
+   \item Different instruments and identifying assumptions
+     \vitem No need to specify functional form on the supply side to get identification.
+     \vitem Able to use brand fixed-effects to control for unobserved product characteristics
+     \begin{itemize}
+     \item This is a big methodological contribution, since it does a better job fitting observed data (see $R^2 \sim 0.95$ earlier) and Nevo shows that it isn't a computational nightmare
+     \end{itemize}
+   \end{enumerate}
+ \end{frame}
+ %
+ \begin{frame}{Estimating Equations}
+   \begin{itemize}
+   \item Estimate via GMM
+     \vitem Construct an \emph{error term} $\omega$ that satisfies $E[Z^\prime \omega(\theta^\ast)] = 0$; $Z$ are instruments
+     \[
+\hat{\theta} = \arg \min_\theta \omega(\theta)^\prime Z \left(\widehat{E[Z^\prime \omega \omega^\prime Z]}\right)^{-1} Z^\prime \omega(\theta)
+     \]
+     \vitem Error term $\omega \equiv \xi_j + \Delta \xi_{jt}$ (with brand dummies, $\omega \equiv \Delta \xi_{jt}$)
+     \vitem Solve implicit set of equations
+     \[
+     \underbrace{s_{.t}(x, p_{.t}, \delta_{.t}; \theta_2)}_{\text{share function}} = \underbrace{S_{.t}}_{\text{shares}}
+     \]
+     \vitem Invert numerically;
+     \[
+\underbrace{\omega_{jt} = \delta_{jt}(x, p_{.t}, S_{.t}; \theta_2)}_{\text{nonlinear bit}} - (x_j \beta + \alpha p_{jt})
+     \]
+   \end{itemize}
+ \end{frame}
+ %
+ \begin{frame}{Instruments (two sets)}
+   \textbf{Set 1}:
+     \begin{itemize}
+     \item \textbf{Assumption}: city-specific valuations are independent across cities
+       \item \textbf{Instrument}: prices of the brand in other cities
+         \item \textbf{Violation}: National shock to only \emph{some} types of cereal
+     \end{itemize}
+     \vfill
+     \textbf{Set 2}:
+     \begin{itemize}
+     \item \textbf{Assumption}: direct production costs are uncorrelated with prices (too small, or captured by other variables)
+       \item \textbf{Instrument}: direct proxies for marginal costs
+         \item \textbf{Violation}: persistent regional shock for some brands
+     \end{itemize}
+ \end{frame}
+ \begin{frame}{Results: Logit---Importance of Brand-dummies---Valid-IVs}
+   \centering
+   \includegraphics[width=\textwidth, keepaspectratio=true]{tab5.png}
+   \end{frame}
+   %
+   \begin{frame}{Results---Full Model}
+     \begin{center}
+       \includegraphics[height=0.9\textheight, keepaspectratio=true]{tab6.png}
+     \end{center}
+   \end{frame}
+   %
+   \begin{frame}{}
+     \centering
+     \includegraphics[width=\textwidth, keepaspectratio=true]{tab7.png}
+   \end{frame}
+   %
+   \begin{frame}{Results: Firm Behavior---Nevo vs. Logit}
+     \begin{center}
+      \includegraphics[width=\textwidth, keepaspectratio=true]{tab8.png} 
+     \end{center}
+   \end{frame}
+   %
+   \begin{frame}{Conclusions}
+     \begin{quote}
+       If we are willing to accept Nash-Bertrand as a benchmark of noncollusive pricing\ldots even with PCM greater than 45\%, prices in the industry are not a result of collusive behavior. The results rule out an extreme version of cooperative pricing\ldots the results in this paper do not rule out cooperate pricing between a subset of products \ldots
+     \end{quote}
+    \vfill 
+     \begin{quote}
+       As much as I would like to claim that this paper proves or disproves the FTC's case, I cannot\ldots the high observed PCM are primarily due to the firms' ability to maintain a portfolio of differentiated products\ldots
+     \end{quote}
+   \end{frame}
+%
+ \begin{frame}{Quick Aside---Transparency}
+  \begin{quote} 
+    A comment is in place about the realism of the assumption that consumers choose no more
+than one brand. Many households buy more than one brand of cereal in each supermarket trip but
+most people consume only one brand of cereal at a time, which is the relevant fact for this modeling
+assumption. Nevertheless, if one is still unwilling to accept that this is a negligible phenomenon, then
+this model can be viewed as an approximation to the true choice model. An alternative is to
+explicitly model the choice of multiple products, or continuous quantities
+(as in Dubin and McFadden (1984) or Hendel (1999)).
+\end{quote}
+\begin{quote}
+  Treating the characteristics as predetermined, rather than reacting to demand
+shocks, is as reasonable
+(or unreasonable)
+here as it was in previous work.
+\end{quote}
+ \end{frame}
+ %
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

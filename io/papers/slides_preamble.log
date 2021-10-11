@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.5.25)  3 OCT 2021 22:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.10.5)  10 OCT 2021 13:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1017,8 +1017,81 @@ Missing character: There is no 2 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 Missing character: There is no 4 in font nullfont!
 ./slides_preamble.tex:94: Undefined control sequence.
-l.94 \usecolortheme
-                   [named=MIT]{structure}
+l.94 \definecolor
+                 {UCLA}{rgb}{0.15294117647058825, 0.4549019607843137, 0.6823...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+Missing character: There is no U in font nullfont!
+Missing character: There is no C in font nullfont!
+Missing character: There is no L in font nullfont!
+Missing character: There is no A in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no b in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no . in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 5 in font nullfont!
+Missing character: There is no 2 in font nullfont!
+Missing character: There is no 9 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no 6 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no 5 in font nullfont!
+Missing character: There is no 8 in font nullfont!
+Missing character: There is no 8 in font nullfont!
+Missing character: There is no 2 in font nullfont!
+Missing character: There is no 5 in font nullfont!
+Missing character: There is no , in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no . in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 5 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 9 in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 9 in font nullfont!
+Missing character: There is no 6 in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no 8 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 3 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 3 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no , in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no . in font nullfont!
+Missing character: There is no 6 in font nullfont!
+Missing character: There is no 8 in font nullfont!
+Missing character: There is no 2 in font nullfont!
+Missing character: There is no 3 in font nullfont!
+Missing character: There is no 5 in font nullfont!
+Missing character: There is no 2 in font nullfont!
+Missing character: There is no 9 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 1 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no 6 in font nullfont!
+Missing character: There is no 4 in font nullfont!
+Missing character: There is no 7 in font nullfont!
+Missing character: There is no 0 in font nullfont!
+Missing character: There is no 6 in font nullfont!
+./slides_preamble.tex:95: Undefined control sequence.
+l.95 \usecolortheme
+                   [named=UCLA]{structure}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1032,9 +1105,10 @@ Missing character: There is no m in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no d in font nullfont!
 Missing character: There is no = in font nullfont!
-Missing character: There is no M in font nullfont!
-Missing character: There is no I in font nullfont!
-Missing character: There is no T in font nullfont!
+Missing character: There is no U in font nullfont!
+Missing character: There is no C in font nullfont!
+Missing character: There is no L in font nullfont!
+Missing character: There is no A in font nullfont!
 Missing character: There is no ] in font nullfont!
 Missing character: There is no s in font nullfont!
 Missing character: There is no t in font nullfont!
@@ -1045,8 +1119,8 @@ Missing character: There is no t in font nullfont!
 Missing character: There is no u in font nullfont!
 Missing character: There is no r in font nullfont!
 Missing character: There is no e in font nullfont!
-./slides_preamble.tex:95: Undefined control sequence.
-l.95 \usecolortheme
+./slides_preamble.tex:96: Undefined control sequence.
+l.96 \usecolortheme
                    {dolphin}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1061,8 +1135,8 @@ Missing character: There is no p in font nullfont!
 Missing character: There is no h in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
-./slides_preamble.tex:96: Undefined control sequence.
-l.96 \setbeamertemplate
+./slides_preamble.tex:97: Undefined control sequence.
+l.97 \setbeamertemplate
                        {navigation symbols}{}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1087,8 +1161,8 @@ Missing character: There is no b in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no l in font nullfont!
 Missing character: There is no s in font nullfont!
-./slides_preamble.tex:97: Undefined control sequence.
-l.97 \setbeamertemplate
+./slides_preamble.tex:98: Undefined control sequence.
+l.98 \setbeamertemplate
                        {footline}{}{}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1104,8 +1178,8 @@ Missing character: There is no l in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no e in font nullfont!
-./slides_preamble.tex:98: Undefined control sequence.
-l.98 \setbeamertemplate
+./slides_preamble.tex:99: Undefined control sequence.
+l.99 \setbeamertemplate
                        {headline}{}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1121,9 +1195,9 @@ Missing character: There is no l in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no e in font nullfont!
-./slides_preamble.tex:99: Undefined control sequence.
-l.99 \setbeamertemplate
-                       {navigation symbols}{}
+./slides_preamble.tex:100: Undefined control sequence.
+l.100 \setbeamertemplate
+                        {navigation symbols}{}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1147,8 +1221,8 @@ Missing character: There is no b in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no l in font nullfont!
 Missing character: There is no s in font nullfont!
-./slides_preamble.tex:100: Undefined control sequence.
-l.100 \mode
+./slides_preamble.tex:101: Undefined control sequence.
+l.101 \mode
            <presentation> {}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1170,8 +1244,8 @@ Missing character: There is no i in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no > in font nullfont!
-./slides_preamble.tex:101: Undefined control sequence.
-l.101 \setbeamercolor
+./slides_preamble.tex:102: Undefined control sequence.
+l.102 \setbeamercolor
                      {block title}{use=structure,fg=white,bg=RoyalBlue} %blo...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1224,8 +1298,8 @@ Missing character: There is no B in font nullfont!
 Missing character: There is no l in font nullfont!
 Missing character: There is no u in font nullfont!
 Missing character: There is no e in font nullfont!
-./slides_preamble.tex:102: Undefined control sequence.
-l.102 \setbeamercolor
+./slides_preamble.tex:103: Undefined control sequence.
+l.103 \setbeamercolor
                      {block title alerted}{use=structure,fg=white,bg=ForestG...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1288,24 +1362,24 @@ Missing character: There is no e in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no n in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 92--103
+Overfull \hbox (20.0pt too wide) in paragraph at lines 92--104
 []
  []
 
 
-./slides_preamble.tex:104: LaTeX Error: Command \qedsymbol undefined.
+./slides_preamble.tex:105: LaTeX Error: Command \qedsymbol undefined.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.104 \renewcommand\qedsymbol
+l.105 \renewcommand\qedsymbol
                              {$\blacksquare$} %set QED symbol as black square
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
-./slides_preamble.tex:106: Undefined control sequence.
-l.106 \setbeamertemplate
+./slides_preamble.tex:107: Undefined control sequence.
+l.107 \setbeamertemplate
                         {footline}[frame number] %slide numbers
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1314,13 +1388,13 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-./slides_preamble.tex:106: LaTeX Error: Missing \begin{document}.
+./slides_preamble.tex:107: LaTeX Error: Missing \begin{document}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.106 \setbeamertemplate{f
+l.107 \setbeamertemplate{f
                           ootline}[frame number] %slide numbers
 You're in trouble here.  Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -1346,8 +1420,8 @@ Missing character: There is no b in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no r in font nullfont!
 Missing character: There is no ] in font nullfont!
-./slides_preamble.tex:107: Undefined control sequence.
-l.107 \setbeamertemplate
+./slides_preamble.tex:108: Undefined control sequence.
+l.108 \setbeamertemplate
                         {itemize item}[circle] %bullet style
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1374,8 +1448,8 @@ Missing character: There is no c in font nullfont!
 Missing character: There is no l in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no ] in font nullfont!
-./slides_preamble.tex:108: Undefined control sequence.
-l.108 \setbeamertemplate
+./slides_preamble.tex:109: Undefined control sequence.
+l.109 \setbeamertemplate
                         {itemize subitem}{--}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1399,8 +1473,8 @@ Missing character: There is no e in font nullfont!
 Missing character: There is no m in font nullfont!
 Missing character: There is no - in font nullfont!
 Missing character: There is no - in font nullfont!
-./slides_preamble.tex:109: Undefined control sequence.
-l.109 \setbeamertemplate
+./slides_preamble.tex:110: Undefined control sequence.
+l.110 \setbeamertemplate
                         {enumerate item}[default]
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1430,8 +1504,8 @@ Missing character: There is no u in font nullfont!
 Missing character: There is no l in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no ] in font nullfont!
-./slides_preamble.tex:110: Undefined control sequence.
-l.110 \newrobustcmd
+./slides_preamble.tex:111: Undefined control sequence.
+l.111 \newrobustcmd
                    *{\parentexttrack}[1]{%
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1440,8 +1514,8 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 Missing character: There is no * in font nullfont!
-./slides_preamble.tex:110: Undefined control sequence.
-l.110 \newrobustcmd*{\parentexttrack
+./slides_preamble.tex:111: Undefined control sequence.
+l.111 \newrobustcmd*{\parentexttrack
                                     }[1]{%
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1452,8 +1526,8 @@ and I'll forget about whatever was undefined.
 Missing character: There is no [ in font nullfont!
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no ] in font nullfont!
-./slides_preamble.tex:112: Undefined control sequence.
-l.112   \blx@blxinit
+./slides_preamble.tex:113: Undefined control sequence.
+l.113   \blx@blxinit
                     
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1461,8 +1535,8 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-./slides_preamble.tex:113: Undefined control sequence.
-l.113   \blx@setsfcodes
+./slides_preamble.tex:114: Undefined control sequence.
+l.114   \blx@setsfcodes
                        
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1470,8 +1544,8 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-./slides_preamble.tex:114: Undefined control sequence.
-l.114   \blx@bibopenparen
+./slides_preamble.tex:115: Undefined control sequence.
+l.115   \blx@bibopenparen
                          #1\blx@bibcloseparen
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1479,9 +1553,9 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-./slides_preamble.tex:114: You can't use `macro parameter character #' in horiz
+./slides_preamble.tex:115: You can't use `macro parameter character #' in horiz
 ontal mode.
-l.114   \blx@bibopenparen#
+l.115   \blx@bibopenparen#
                           1\blx@bibcloseparen
 Sorry, but I'm not programmed to handle this case;
 I'll just pretend that you didn't ask for it.
@@ -1489,8 +1563,8 @@ If you're in the wrong mode, you might be able to
 return to the right one by typing `I}' or `I$' or `I\par'.
 
 Missing character: There is no 1 in font nullfont!
-./slides_preamble.tex:114: Undefined control sequence.
-l.114   \blx@bibopenparen#1\blx@bibcloseparen
+./slides_preamble.tex:115: Undefined control sequence.
+l.115   \blx@bibopenparen#1\blx@bibcloseparen
                                              
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1499,12 +1573,12 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 106--116
+Overfull \hbox (20.0pt too wide) in paragraph at lines 107--117
 []
  []
 
-./slides_preamble.tex:117: Undefined control sequence.
-l.117 \AtEveryCite
+./slides_preamble.tex:118: Undefined control sequence.
+l.118 \AtEveryCite
                   {%
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1513,37 +1587,19 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-./slides_preamble.tex:120: LaTeX Error: Missing \begin{document}.
+./slides_preamble.tex:137: LaTeX Error: Command \maketitle undefined.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.120   \let\bibcloseparen=\bibclosebracket}e
-                                             
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-Missing character: There is no e in font nullfont!
-
-Overfull \hbox (20.0pt too wide) in paragraph at lines 120--121
-[] 
- []
-
-
-./slides_preamble.tex:136: LaTeX Error: Command \maketitle undefined.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.136 \renewcommand{\maketitle}
+l.137 \renewcommand{\maketitle}
                                {
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
-./slides_preamble.tex:144: Undefined control sequence.
-l.144 \usefonttheme
+./slides_preamble.tex:145: Undefined control sequence.
+l.145 \usefonttheme
                    [onlymath]{serif}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1552,13 +1608,13 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-./slides_preamble.tex:144: LaTeX Error: Missing \begin{document}.
+./slides_preamble.tex:145: LaTeX Error: Missing \begin{document}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.144 \usefonttheme[
+l.145 \usefonttheme[
                     onlymath]{serif}
 You're in trouble here.  Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -1579,13 +1635,13 @@ Missing character: There is no r in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no f in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 144--145
+Overfull \hbox (20.0pt too wide) in paragraph at lines 145--146
 [] 
  []
 
 \c@claim=\count180
-./slides_preamble.tex:159: Undefined control sequence.
-l.159 \institute
+./slides_preamble.tex:160: Undefined control sequence.
+l.160 \institute
                 []{}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1594,13 +1650,13 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-./slides_preamble.tex:159: LaTeX Error: Missing \begin{document}.
+./slides_preamble.tex:160: LaTeX Error: Missing \begin{document}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.159 \institute[
+l.160 \institute[
                  ]{}
 You're in trouble here.  Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.

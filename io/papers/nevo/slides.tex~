@@ -1,0 +1,19 @@
+\documentclass{beamer}
+\input{../slides_preamble}
+
+\begin{document}
+\maketitle
+\begin{frame}{Overview}
+  \begin{itemize}
+  \item Are RTE cereal firms colluding?
+    \begin{itemize}
+    \item Existing evidence says probably yes.
+    \end{itemize}
+    \item Consumers spend $\sim 9$B/year on cereal (wow) and firms make $\sim 3$B on profits (again, wow)
+  \end{itemize}
+\end{frame}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
