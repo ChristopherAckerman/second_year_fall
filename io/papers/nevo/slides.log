@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.10.5)  10 OCT 2021 21:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.10.5)  11 OCT 2021 12:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1681,10 +1681,10 @@ Package logreq Info: Writing requests to 'slides.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 45093 strings out of 478994
- 1012662 string characters out of 5864751
- 1837394 words of memory out of 5000000
- 61698 multiletter control sequences out of 15000+600000
+ 45094 strings out of 478994
+ 1012678 string characters out of 5864751
+ 1837445 words of memory out of 5000000
+ 61699 multiletter control sequences out of 15000+600000
  450638 words of font info for 69 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  131i,16n,132p,756b,1647s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1703,7 +1703,7 @@ m/lmssbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsso10.pfb></usr/s
 hare/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf-dist/fonts/t
 ype1/public/lm/lmsy8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/sym
 bols/msbm10.pfb>
-Output written on slides.pdf (16 pages, 815462 bytes).
+Output written on slides.pdf (16 pages, 815482 bytes).
 PDF statistics:
  179 PDF objects out of 1000 (max. 8388607)
  132 compressed objects within 2 object streams
