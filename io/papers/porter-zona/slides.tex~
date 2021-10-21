@@ -1,0 +1,8 @@
+\documentclass[dvipsnames]{beamer}
+\input{../slides_preamble}
+
+\begin{document}
+\begin{frame}{}
+ Hello World 
+\end{frame}
+\end{document}
