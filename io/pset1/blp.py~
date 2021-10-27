@@ -1,0 +1,16 @@
+import pandas as pd
+import numpy as np
+from scipy.optimize import minimize
+import scipy
+from numba import jit, njit, prange
+import time
+import multiprocessing as mp
+import pickle
+from sklearn.linear_model import LinearRegression
+import pyblp
+import os
+
+my_working_dir = "~/files/school/ucla/second_year/fall/io/pset1"
+os.chdir(my_working_dir)
+
+df = pd.read_csv("blp.csv")
