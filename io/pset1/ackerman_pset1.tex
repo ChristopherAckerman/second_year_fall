@@ -140,11 +140,23 @@ Our results for this section don't make sense, and there are a few indications t
 Note that we have one more element of $\beta$ than we should. When we constructed the dummies, we neglected to exclude one dummy variable, but we were unable to re-run our code before submitting our results. Given more time, we would re-run this step, and we suspect that the coefficients would then make more sense.
 
 \subsection*{What are the elasticities for store 9 in week 10?}
-We under-estimated the difficulty of this question. We know that we can calculate this from the first order conditions, and that we need to take a numerical integral over consumers, but we don't know how to do this.
+% We under-estimated the difficulty of this question. We know that we can calculate this from the first order conditions, and that we need to take a numerical integral over consumers, but we don't know how to do this.
+We are going to use the approximation
+\[
+\eta^k_j \approx \frac{p_k}{s_j}\sum_i (\alpha + \sigma_I I_i) (-s_{ij} s_{ik} + \mathbb{1}_{k = j} s_{ik}).
+\]
+For the purposes of this question $i$ is a singleton and there is no joint ownership.
+
+\begin{table}[htp]
+  \centering
+    \include{elasticities.tex}
+\end{table}
+
+These elasticities are not believable. The important/theoretical difference from the logit elasticities is that elasticities are no longer simply a function of shares, and are now a function of product characteristics as well (so for instance consumers are more likely to switch from one branded product to another than from a branded product to a generic, even if the branded product and generic have similar market shares). The striking problems are the massive magnitudes for own-price elasticities and the uniform negativity of the cross-price elasticities. This is most likely due to an error in our parameter estimates from the previous section.
 
 \subsection*{Back out the marginal costs for store 9 in week 10. How are they different from wholesale costs?}
 
-We have code that does this (for part 3) but we were unable to run it before turning in the HW. It should be almost exactly the same procedure as in part 3, but we need to use the random coefficient model's coefficients, and we are running into bugs in the code when we do that.
+We have code that does this (for part 3) but we were unable to run it before turning in the HW. It should be almost exactly the same procedure as in part 3, but we need to use results from the random coefficients model, and we are running into bugs in the code when we do that.
 
 \newpage
 \section*{Problem 3}
