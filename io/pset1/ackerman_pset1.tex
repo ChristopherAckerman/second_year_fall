@@ -1,0 +1,89 @@
+\documentclass[dvipsnames]{article}
+\input{../article_preamble.tex}
+\title{IO Problem Set 1 (BLP)}
+
+
+\begin{document}
+\maketitle
+\section*{Problem 1}
+\subsection*{Estimate the Model using OLS, with price and promotion as characteristics}
+
+\begin{table}
+  \centering
+  \include{1-1.tex}
+\end{table}
+\newpage
+
+\subsection*{Estimate the Model using OLS, with price and promotion as characteristics, and brand dummies}
+
+\begin{table}
+  \centering
+  \include{1-2.tex}
+  \end{table}
+  \newpage
+
+\subsection*{Estimate the Model using OLS, with price and promotion as characteristics, and store-brand dummies}
+
+\begin{table}
+  \centering
+  \include{1-3.tex}
+  \end{table}
+  \newpage
+
+\subsection*{Estimate the models from parts 1--3 using wholesale cost as an instrument}
+
+\begin{table}
+  \centering
+  \include{1-4a.tex}
+  \end{table}
+  \newpage
+
+\begin{table}
+  \centering
+  \include{1-4b.tex}
+  \end{table}
+
+\begin{table}
+  \centering
+  \include{1-4c.tex}
+  \end{table}
+
+
+  \subsection*{Estimate the models from parts 1--3 using the Hausman instrument}
+
+\begin{table}
+  \centering
+  \include{1-5a.tex}
+  \end{table}
+  \newpage
+
+\begin{table}
+  \centering
+  \include{1-5b.tex}
+  \end{table}
+
+\begin{table}
+  \centering
+  \include{1-5c.tex}
+  \end{table}
+  \\
+
+\newpage
+\subsection*{Mean own-price elasticities from the estimates in models 1--3}
+
+\begin{table}
+  \centering
+  \include{1-6.tex}
+  \end{table}
+
+These results make sense. As a rule of thumb, the own-price elasticities should be $\in (-2, -5)$. The IV estimates using the Hausman instrument are approximately in this range. The OLS estimates are not, indicating that endogeneity is a practical concern in this setting. The estimates with wholesale cost as an instrument are also ``too small'', indicating that wholesale cost may not be a viable instrument in this context.
+
+
+
+  
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
