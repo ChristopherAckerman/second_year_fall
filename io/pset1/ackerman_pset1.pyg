@@ -1,0 +1,4 @@
+# OLS with price and promotion as product characteristics and brand dummies
+# using wholesale cost as instrument
+
+wholeSale_IV3 = iv.IV2SLS.from_formula('Y ~ 1 + [prices ~ cost_] + prom_ + C(brand)*C(store)', data=otc_dataDf).fit()

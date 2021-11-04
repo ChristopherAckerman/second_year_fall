@@ -1,0 +1,875 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{err}{!}\PYG{n}{find} \PYG{o}{/} \PYG{o}{\PYGZhy{}}\PYG{n}{iname} \PYG{l+s+s1}{\PYGZsq{}libdevice\PYGZsq{}}
+\PYG{err}{!}\PYG{n}{find} \PYG{o}{/} \PYG{o}{\PYGZhy{}}\PYG{n}{iname} \PYG{l+s+s1}{\PYGZsq{}libnvvm.so\PYGZsq{}}
+
+\PYG{c+c1}{\PYGZsh{}Add two libraries to numba environment variables:}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{from} \PYG{n+nn}{scipy.optimize} \PYG{k+kn}{import} \PYG{n}{minimize}
+\PYG{n}{os}\PYG{o}{.}\PYG{n}{environ}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}NUMBAPRO\PYGZus{}LIBDEVICE\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}/usr/local/cuda\PYGZhy{}10.0/nvvm/libdevice\PYGZdq{}}
+\PYG{n}{os}\PYG{o}{.}\PYG{n}{environ}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}NUMBAPRO\PYGZus{}NVVM\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}/usr/local/cuda\PYGZhy{}10.0/nvvm/lib64/libnvvm.so\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{}install linear and pyBLP models}
+\PYG{err}{!}\PYG{n}{pip} \PYG{n}{install} \PYG{n}{linearmodels}
+\PYG{err}{!}\PYG{n}{pip} \PYG{n}{install} \PYG{n}{pyBLP}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}note: must restart runtime\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{} Import Packages}
+
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}                    \PYG{c+c1}{\PYGZsh{} for data handling}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}                     \PYG{c+c1}{\PYGZsh{} for numerical methods and data structures}
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k}{as} \PYG{n+nn}{plt}        \PYG{c+c1}{\PYGZsh{} for plotting}
+\PYG{k+kn}{import} \PYG{n+nn}{seaborn} \PYG{k}{as} \PYG{n+nn}{sea}                  \PYG{c+c1}{\PYGZsh{} advanced plotting}
+\PYG{k+kn}{import} \PYG{n+nn}{patsy}                           \PYG{c+c1}{\PYGZsh{} provides a syntax for specifying models}
+\PYG{k+kn}{import} \PYG{n+nn}{linearmodels.iv} \PYG{k}{as} \PYG{n+nn}{iv}           \PYG{c+c1}{\PYGZsh{} provides IV statistical modeling}
+\PYG{k+kn}{import} \PYG{n+nn}{statsmodels.api} \PYG{k}{as} \PYG{n+nn}{sm}           \PYG{c+c1}{\PYGZsh{} provides statistical models like ols, gmm, anova, etc...}
+\PYG{k+kn}{import} \PYG{n+nn}{statsmodels.formula.api} \PYG{k}{as} \PYG{n+nn}{smf}  \PYG{c+c1}{\PYGZsh{} provides a way to directly spec models from formulas}
+\PYG{k+kn}{import} \PYG{n+nn}{pyblp}                           \PYG{c+c1}{\PYGZsh{} for BLP}
+\PYG{k+kn}{import} \PYG{n+nn}{time}
+\PYG{k+kn}{from} \PYG{n+nn}{numba} \PYG{k+kn}{import} \PYG{n}{njit}\PYG{p}{,} \PYG{n}{prange}\PYG{p}{,} \PYG{n}{cuda}   \PYG{c+c1}{\PYGZsh{} for acceleration of functions}
+\PYG{k+kn}{from} \PYG{n+nn}{statsmodels.iolib.summary2} \PYG{k+kn}{import} \PYG{n}{summary\PYGZus{}col}
+
+\PYG{c+c1}{\PYGZsh{} Login to drive}
+
+\PYG{k+kn}{from} \PYG{n+nn}{google.colab} \PYG{k+kn}{import} \PYG{n}{auth}
+\PYG{n}{auth}\PYG{o}{.}\PYG{n}{authenticate\PYGZus{}user}\PYG{p}{()}
+
+\PYG{k+kn}{import} \PYG{n+nn}{gspread}
+\PYG{k+kn}{from} \PYG{n+nn}{oauth2client.client} \PYG{k+kn}{import} \PYG{n}{GoogleCredentials}
+
+\PYG{n}{gc} \PYG{o}{=} \PYG{n}{gspread}\PYG{o}{.}\PYG{n}{authorize}\PYG{p}{(}\PYG{n}{GoogleCredentials}\PYG{o}{.}\PYG{n}{get\PYGZus{}application\PYGZus{}default}\PYG{p}{())}
+
+\PYG{c+c1}{\PYGZsh{} Download data}
+
+\PYG{n}{otc\PYGZus{}data} \PYG{o}{=} \PYG{n}{gc}\PYG{o}{.}\PYG{n}{open\PYGZus{}by\PYGZus{}url}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}https://docs.google.com/spreadsheets/d/1YP2uhQ\PYGZhy{}l4MF2HzjesLa0qcZG0olk\PYGZhy{}Opqdb1Ew9Z4qPo/edit\PYGZsh{}gid=0\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}data} \PYG{o}{=} \PYG{n}{otc\PYGZus{}data}\PYG{o}{.}\PYG{n}{worksheet}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Sheet1\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}dataDf} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{otc\PYGZus{}data}\PYG{o}{.}\PYG{n}{get\PYGZus{}all\PYGZus{}records}\PYG{p}{())}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{head}\PYG{p}{())}
+
+\PYG{n}{otc\PYGZus{}demographics} \PYG{o}{=} \PYG{n}{gc}\PYG{o}{.}\PYG{n}{open\PYGZus{}by\PYGZus{}url}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}https://docs.google.com/spreadsheets/d/1RL7sbL4YJs9C6hDiDlVZSDb5SWpN6EHATmbHZQL9Crc/edit\PYGZsh{}gid=0\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}demographics} \PYG{o}{=} \PYG{n}{otc\PYGZus{}demographics}\PYG{o}{.}\PYG{n}{worksheet}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Sheet1\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}demographicsDf} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{otc\PYGZus{}demographics}\PYG{o}{.}\PYG{n}{get\PYGZus{}all\PYGZus{}records}\PYG{p}{())}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{otc\PYGZus{}demographicsDf}\PYG{o}{.}\PYG{n}{head}\PYG{p}{())}
+
+\PYG{n}{otc\PYGZus{}dataInstruments} \PYG{o}{=} \PYG{n}{gc}\PYG{o}{.}\PYG{n}{open\PYGZus{}by\PYGZus{}url}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}https://docs.google.com/spreadsheets/d/1H3I\PYGZhy{}wfVjNQFlUhxkkUF58cWD67xTY16Dmtya5HcA3Wg/edit\PYGZsh{}gid=1444543832\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}dataInstruments} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataInstruments}\PYG{o}{.}\PYG{n}{worksheet}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}OTCDataInstruments\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}dataInstrumentsDf} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataInstruments}\PYG{o}{.}\PYG{n}{get\PYGZus{}all\PYGZus{}records}\PYG{p}{())}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataInstrumentsDf}\PYG{o}{.}\PYG{n}{head}\PYG{p}{())}
+
+\PYG{c+c1}{\PYGZsh{} Recreate the Summary Table in the PS}
+
+\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}summary}\PYG{p}{(}\PYG{n}{data}\PYG{p}{):}
+
+  \PYG{n}{salesTotal} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{)[}\PYG{l+s+s1}{\PYGZsq{}sales\PYGZus{}\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}fullPrice\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{price\PYGZus{}} \PYG{o}{+} \PYG{n}{data}\PYG{o}{.}\PYG{n}{prom\PYGZus{}}
+  \PYG{n}{priceAvg} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{])[}\PYG{l+s+s1}{\PYGZsq{}price\PYGZus{}\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+  \PYG{n}{fullPriceAvg} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{])[}\PYG{l+s+s1}{\PYGZsq{}fullPrice\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+  \PYG{n}{promoAvg} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{])[}\PYG{l+s+s1}{\PYGZsq{}prom\PYGZus{}\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+  \PYG{n}{costAvg} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{])[}\PYG{l+s+s1}{\PYGZsq{}cost\PYGZus{}\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+  \PYG{n}{marketShare} \PYG{o}{=} \PYG{n}{salesTotal}\PYG{o}{/}\PYG{n+nb}{sum}\PYG{p}{(}\PYG{n}{salesTotal}\PYG{p}{)}
+
+  \PYG{n}{sumTable} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{((}\PYG{n}{salesTotal}\PYG{p}{,} \PYG{n}{marketShare}\PYG{p}{,} \PYG{n}{priceAvg}\PYG{p}{,} \PYG{n}{promoAvg}\PYG{p}{,} \PYG{n}{fullPriceAvg}\PYG{p}{,} \PYG{n}{costAvg}\PYG{p}{),} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+  \PYG{n}{sumTable} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{sumTable}\PYG{p}{)}
+  \PYG{n}{sumTable}\PYG{o}{.}\PYG{n}{columns} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}salesTotal\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}marketShare\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}priceAvg\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}promoAvg\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}fullPriceAvg\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}costAvg\PYGZsq{}}\PYG{p}{]}
+  \PYG{n}{sumTable}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}sizeTab\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{25}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{100}\PYG{p}{,}\PYG{l+m+mi}{25}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{100}\PYG{p}{,}\PYG{l+m+mi}{25}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{100}\PYG{p}{,}\PYG{l+m+mi}{50}\PYG{p}{,}\PYG{l+m+mi}{100}\PYG{p}{]}
+  \PYG{n}{sumTable}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandName\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}Tylenol\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Tylenol\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Tylenol\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Advil\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Advil\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Advil\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Bayer\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Bayer\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Bayer\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Store\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Store\PYGZsq{}}\PYG{p}{]} 
+  \PYG{n}{sumTable}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{]}
+  
+  \PYG{k}{return}\PYG{p}{(}\PYG{n}{sumTable}\PYG{p}{)}
+
+\PYG{n}{sumTable} \PYG{o}{=} \PYG{n}{get\PYGZus{}summary}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}
+\PYG{n}{sumTable}\PYG{o}{.}\PYG{n}{to\PYGZus{}latex}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}summary\PYGZus{}statistics.tex\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} make a copy of the sales column}
+\PYG{n}{adjusted\PYGZus{}sales} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{sales\PYGZus{}} 
+\PYG{c+c1}{\PYGZsh{} and insert it in dataframe   }
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{n}{loc}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{column}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{,} \PYG{n}{value}\PYG{o}{=}\PYG{n}{adjusted\PYGZus{}sales}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{adjust\PYGZus{}sales}\PYG{p}{(}\PYG{n}{data}\PYG{p}{):}
+  \PYG{l+s+sd}{\PYGZsq{}\PYGZsq{}\PYGZsq{}}
+\PYG{l+s+sd}{  3 package sizes \PYGZhy{} normalize to 25 tabs for market share calculations}
+\PYG{l+s+sd}{  \PYGZsq{}\PYGZsq{}\PYGZsq{}}
+
+  \PYG{c+c1}{\PYGZsh{} divide 50 tab sales by 2}
+  \PYG{n}{tab\PYGZus{}50} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{,}\PYG{l+m+mi}{5}\PYG{p}{,}\PYG{l+m+mi}{8}\PYG{p}{,}\PYG{l+m+mi}{10}\PYG{p}{]}
+  \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{tab\PYGZus{}50}\PYG{p}{:}
+    \PYG{n}{data}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{]} \PYG{o}{==} \PYG{n}{i}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]}\PYG{o}{/}\PYG{l+m+mi}{2}
+
+  \PYG{c+c1}{\PYGZsh{} divide 100 tab sales by 4}
+  \PYG{n}{tab\PYGZus{}100} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{6}\PYG{p}{,}\PYG{l+m+mi}{9}\PYG{p}{,}\PYG{l+m+mi}{11}\PYG{p}{]}
+  \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{tab\PYGZus{}100}\PYG{p}{:}
+    \PYG{n}{data}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{]} \PYG{o}{==} \PYG{n}{i}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]}\PYG{o}{/}\PYG{l+m+mi}{4}
+
+  \PYG{k}{return}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}
+
+\PYG{n}{otc\PYGZus{}dataDf} \PYG{o}{=} \PYG{n}{adjust\PYGZus{}sales}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}
+
+\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}shares}\PYG{p}{(}\PYG{n}{data}\PYG{p}{):}
+
+  \PYG{c+c1}{\PYGZsh{} calucalte adj. shares by market (store\PYGZhy{}week)}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}quant\PYGZus{}store\PYGZus{}week\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{([}\PYG{l+s+s1}{\PYGZsq{}store\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}week\PYGZsq{}}\PYG{p}{])[}\PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}sum\PYGZsq{}}\PYG{p}{)}
+  \PYG{c+c1}{\PYGZsh{} calculate weekly share}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}weekly\PYGZus{}share\PYGZsq{}}\PYG{p}{]} \PYG{o}{=}  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}adjusted\PYGZus{}sales\PYGZsq{}}\PYG{p}{]} \PYG{o}{/} \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}quant\PYGZus{}store\PYGZus{}week\PYGZsq{}}\PYG{p}{]}
+  \PYG{c+c1}{\PYGZsh{} calculate outside share}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}outshr\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}quant\PYGZus{}store\PYGZus{}week\PYGZsq{}}\PYG{p}{]}\PYG{o}{/}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}count\PYGZsq{}}\PYG{p}{])}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}weekly\PYGZus{}share\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}weekly\PYGZus{}share\PYGZsq{}}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}outshr\PYGZsq{}}\PYG{p}{])}
+
+  \PYG{c+c1}{\PYGZsh{} generate logged relative purchase probabilities}
+  \PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}Y\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{log}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}weekly\PYGZus{}share\PYGZsq{}}\PYG{p}{])} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{log}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}outshr\PYGZsq{}}\PYG{p}{])}
+
+  \PYG{k}{return} \PYG{n}{data}
+
+\PYG{n}{otc\PYGZus{}dataDf} \PYG{o}{=} \PYG{n}{get\PYGZus{}shares}\PYG{p}{(}\PYG{n}{data} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}
+
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{head}\PYG{p}{()}
+
+\PYG{c+c1}{\PYGZsh{} dummy for branded product}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}branded\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}branded\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mi}{11}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}branded\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+\PYG{c+c1}{\PYGZsh{} constant because thats what the example did}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}cons\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+\PYG{c+c1}{\PYGZsh{} market variable}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}market\PYGZus{}ids\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}store\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n+nb}{str}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}.\PYGZdq{}} \PYG{o}{+} \PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}week\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n+nb}{str}\PYG{p}{)}
+\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}market\PYGZus{}ids\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n+nb}{str}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} rename some variables}
+\PYG{n}{otc\PYGZus{}dataDf} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{rename}\PYG{p}{(\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}price\PYGZus{}\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}weekly\PYGZus{}share\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{\PYGZcb{},} \PYG{n}{axis}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}columns\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Merge dfs}
+
+\PYG{k}{def} \PYG{n+nf}{combine\PYGZus{}data}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{,} \PYG{n}{instruments}\PYG{p}{,} \PYG{n}{demographics}\PYG{p}{,} \PYG{n}{sumTable}\PYG{p}{):}
+ 
+  \PYG{c+c1}{\PYGZsh{} brand name}
+  \PYG{n}{otc\PYGZus{}dataDf} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{merge}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{,} \PYG{n}{sumTable}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{],} \PYG{n}{left\PYGZus{}on}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{],} \PYG{n}{right\PYGZus{}index}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+  \PYG{c+c1}{\PYGZsh{} instruments}
+  \PYG{n}{merged} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{merge}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{,} \PYG{n}{instruments}\PYG{p}{,} \PYG{n}{left\PYGZus{}on}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}brand\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}store\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}week\PYGZdq{}}\PYG{p}{],} \PYG{n}{right\PYGZus{}on}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}brand\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}store\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}week\PYGZdq{}}\PYG{p}{])}
+  \PYG{c+c1}{\PYGZsh{} demographics}
+  \PYG{n}{full\PYGZus{}data} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{merge}\PYG{p}{(}\PYG{n}{merged}\PYG{p}{,} \PYG{n}{demographics}\PYG{p}{,} \PYG{n}{left\PYGZus{}on}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}store\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}week\PYGZdq{}}\PYG{p}{],} \PYG{n}{right\PYGZus{}on}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}store\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}week\PYGZdq{}}\PYG{p}{])}
+
+  \PYG{k}{return}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{p}{)}
+
+\PYG{n}{full\PYGZus{}data} \PYG{o}{=} \PYG{n}{combine\PYGZus{}data}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{,} \PYG{n}{otc\PYGZus{}dataInstrumentsDf}\PYG{p}{,} \PYG{n}{otc\PYGZus{}demographicsDf}\PYG{p}{,}  \PYG{n}{sumTable}\PYG{o}{=}\PYG{n}{sumTable}\PYG{p}{)}
+
+\PYG{k+kn}{from} \PYG{n+nn}{google.colab} \PYG{k+kn}{import} \PYG{n}{drive}
+\PYG{n}{drive}\PYG{o}{.}\PYG{n}{mount}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}/content/drive\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} rename some variables}
+\PYG{n}{full\PYGZus{}data} \PYG{o}{=} \PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{rename}\PYG{p}{(\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}product\PYGZus{}ids\PYGZsq{}}\PYG{p}{\PYGZcb{},} \PYG{n}{axis}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}columns\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{head}\PYG{p}{()}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}\PYGZsh{}\PYGZsh{} 1. Logit\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{}1.1: Estimate using OLS with price and promotion as product characteristics.}
+\PYG{n}{res\PYGZus{}log1} \PYG{o}{=} \PYG{n}{smf}\PYG{o}{.}\PYG{n}{ols}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} prices + prom\PYGZus{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{res\PYGZus{}log1}\PYG{o}{.}\PYG{n}{summary}\PYG{p}{()}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{} print(res\PYGZus{}log1.summary())}
+
+\PYG{c+c1}{\PYGZsh{}1.2: Estimate using OLS with price and promotion as product characteristics and brand dummies.}
+\PYG{n}{res\PYGZus{}log2} \PYG{o}{=} \PYG{n}{smf}\PYG{o}{.}\PYG{n}{ols}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} prices + prom\PYGZus{} + C(brand)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{res\PYGZus{}log2}\PYG{o}{.}\PYG{n}{summary}\PYG{p}{()}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+
+\PYG{c+c1}{\PYGZsh{}1.3. Using OLS with price and promotion as product characteristics and store\PYGZhy{}brand }
+\PYG{c+c1}{\PYGZsh{}(the interaction of brand and store) dummies.}
+
+\PYG{n}{res\PYGZus{}log3} \PYG{o}{=} \PYG{n}{smf}\PYG{o}{.}\PYG{n}{ols}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} prices + prom\PYGZus{} + C(brand)*C(store)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{res\PYGZus{}log3}\PYG{o}{.}\PYG{n}{summary}\PYG{p}{()}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+
+\PYG{n}{outputOLS} \PYG{o}{=} \PYG{n}{summary\PYGZus{}col}\PYG{p}{([}\PYG{n}{res\PYGZus{}log1}\PYG{p}{,}\PYG{n}{res\PYGZus{}log2}\PYG{p}{,}\PYG{n}{res\PYGZus{}log3}\PYG{p}{],}\PYG{n}{stars}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{outputOLS}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}4. Estimate the models of 1, 2 and 3 using wholesale cost as an instrument.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{} OLS with price and promotion as product characteristics, using wholesale cost as instrument}
+\PYG{n}{wholeSale\PYGZus{}IV1} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} cost\PYGZus{}] + prom\PYGZus{} \PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{wholeSale\PYGZus{}IV1}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}print(wholeSale\PYGZus{}IV1.first\PYGZus{}stage)}
+
+\PYG{c+c1}{\PYGZsh{} OLS with price and promotion as product characteristics and brand dummies}
+\PYG{c+c1}{\PYGZsh{} using wholesale cost as instrument}
+
+\PYG{n}{wholeSale\PYGZus{}IV2} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} cost\PYGZus{}] + prom\PYGZus{} + C(brand)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{wholeSale\PYGZus{}IV2}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}print(wholeSale\PYGZus{}IV2.first\PYGZus{}stage)}
+
+\PYG{c+c1}{\PYGZsh{} OLS with price and promotion as product characteristics and brand dummies}
+\PYG{c+c1}{\PYGZsh{} using wholesale cost as instrument}
+
+\PYG{n}{wholeSale\PYGZus{}IV3} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} cost\PYGZus{}] + prom\PYGZus{} + C(brand)*C(store)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{wholeSale\PYGZus{}IV3}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+
+\PYG{c+c1}{\PYGZsh{} blah = pd.read\PYGZus{}csv(foo)}
+\PYG{c+c1}{\PYGZsh{}print(wholeSale\PYGZus{}IV3.first\PYGZus{}stage)}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}5. Estimate the models of 1, 2 and 3 using Hausman instrument.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{n}{hausman\PYGZus{}IV1} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} pricestore1 + pricestore2 + pricestore3 + pricestore4 + }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s1}{pricestore5 + pricestore6 + pricestore7 + pricestore8 + pricestore9 + pricestore10 + pricestore11 + pricestore12 }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s1}{+ pricestore13 + pricestore14 + pricestore15 + pricestore16 + pricestore17 + pricestore18 + pricestore19 + }\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s1}{pricestore20 + pricestore21 + pricestore22 + pricestore23 + pricestore24 + pricestore25 + pricestore26 +}\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s1}{ pricestore27 + pricestore28 + pricestore29 + pricestore30] + prom\PYGZus{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{full\PYGZus{}data}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{hausman\PYGZus{}IV1}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}print(hausman\PYGZus{}IV1.first\PYGZus{}stage)}
+
+\PYG{n}{hausman\PYGZus{}IV2} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} pricestore1 + pricestore2 + pricestore3 + pricestore4 + pricestore5 + pricestore6 + pricestore7 + pricestore8 + pricestore9 + pricestore10 + pricestore11 + pricestore12 + pricestore13 + pricestore14 + pricestore15 + pricestore16 + pricestore17 + pricestore18 + pricestore19 + pricestore20 + pricestore21 + pricestore22 + pricestore23 + pricestore24 + pricestore25 + pricestore26 + pricestore27 + pricestore28 + pricestore29 + pricestore30] + prom\PYGZus{} + C(product\PYGZus{}ids) \PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{full\PYGZus{}data}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{hausman\PYGZus{}IV2}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}print(hausman\PYGZus{}IV2.first\PYGZus{}stage)}
+
+\PYG{n}{hausman\PYGZus{}IV3} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} pricestore1 + pricestore2 + pricestore3 + pricestore4 + pricestore5 + pricestore6 + pricestore7 + pricestore8 + pricestore9 + pricestore10 + pricestore11 + pricestore12 + pricestore13 + pricestore14 + pricestore15 + pricestore16 + pricestore17 + pricestore18 + pricestore19 + pricestore20 + pricestore21 + pricestore22 + pricestore23 + pricestore24 + pricestore25 + pricestore26 + pricestore27 + pricestore28 + pricestore29 + pricestore30] + prom\PYGZus{} + C(product\PYGZus{}ids)*C(store)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{full\PYGZus{}data}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\PYG{n}{hausman\PYGZus{}IV3}\PYG{o}{.}\PYG{n}{summary}\PYG{o}{.}\PYG{n}{as\PYGZus{}latex}\PYG{p}{()}
+\PYG{c+c1}{\PYGZsh{}print(hausman\PYGZus{}IV3.first\PYGZus{}stage)}
+
+\PYG{k}{def} \PYG{n+nf}{problem1\PYGZus{}6}\PYG{p}{(}
+    \PYG{n}{model}\PYG{p}{,}
+    \PYG{n}{clean\PYGZus{}data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}
+               \PYG{p}{):}
+  \PYG{l+s+sd}{\PYGZsq{}\PYGZsq{}\PYGZsq{}}
+\PYG{l+s+sd}{  Take parameter estimates from given model}
+\PYG{l+s+sd}{  Use the analytic form for logit elasticity to calculate elasticities}
+\PYG{l+s+sd}{  Analytic form for logit elasticity from Levin\PYGZsq{}s notes (slide 13)}
+\PYG{l+s+sd}{  https://web.stanford.edu/\PYGZti{}jdlevin/Econ\PYGZpc{}20257/Demand\PYGZpc{}20Estimation\PYGZpc{}20Slides\PYGZpc{}20B.pdf}
+\PYG{l+s+sd}{  \PYGZsq{}\PYGZsq{}\PYGZsq{}}
+  \PYG{n}{brand\PYGZus{}means} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{(}\PYG{n}{by}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+  \PYG{n}{brand\PYGZus{}means}
+  \PYG{c+c1}{\PYGZsh{} otc\PYGZus{}dataDf}
+
+  \PYG{n}{model\PYGZus{}elasticities} \PYG{o}{=} \PYGZbs{}
+  \PYG{l+m+mi}{1} \PYG{o}{*} \PYG{n}{model}\PYG{o}{.}\PYG{n}{params}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{]} \PYGZbs{}
+    \PYG{o}{*} \PYG{n}{brand\PYGZus{}means}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{]} \PYGZbs{}
+    \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{brand\PYGZus{}means}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{])}
+
+  \PYG{k}{return}\PYG{p}{(}\PYG{n}{model\PYGZus{}elasticities}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} list all logit models}
+\PYG{n}{model\PYGZus{}list} \PYG{o}{=} \PYG{p}{[}\PYG{n}{res\PYGZus{}log1}\PYG{p}{,} \PYG{n}{res\PYGZus{}log2}\PYG{p}{,} \PYG{n}{res\PYGZus{}log3}\PYG{p}{,} 
+              \PYG{n}{wholeSale\PYGZus{}IV1}\PYG{p}{,} \PYG{n}{wholeSale\PYGZus{}IV2}\PYG{p}{,} \PYG{n}{wholeSale\PYGZus{}IV3}\PYG{p}{,} 
+              \PYG{n}{hausman\PYGZus{}IV1}\PYG{p}{,} \PYG{n}{hausman\PYGZus{}IV2}\PYG{p}{,} \PYG{n}{hausman\PYGZus{}IV3}\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{} new dataframe for results}
+\PYG{n}{elasticities\PYGZus{}df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}OLS1\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}OLS2\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}OLS3\PYGZsq{}}\PYG{p}{,} 
+                                        \PYG{l+s+s1}{\PYGZsq{}IV4.1\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}IV4.2\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}IV4.3\PYGZsq{}}\PYG{p}{,}
+                                        \PYG{l+s+s1}{\PYGZsq{}IV5.1\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}IV5.2\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}IV5.3\PYGZsq{}}\PYG{p}{])}
+
+\PYG{c+c1}{\PYGZsh{} run elasticity function on all models}
+\PYG{n}{columnnr} \PYG{o}{=} \PYG{l+m+mi}{0}
+\PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{model\PYGZus{}list}\PYG{p}{:}
+  \PYG{c+c1}{\PYGZsh{}print(elasticities\PYGZus{}df.columns[columnnr])}
+  \PYG{n}{elasticities\PYGZus{}df}\PYG{p}{[}\PYG{n}{elasticities\PYGZus{}df}\PYG{o}{.}\PYG{n}{columns}\PYG{p}{[}\PYG{n}{columnnr}\PYG{p}{]]} \PYG{o}{=} \PYG{n}{problem1\PYGZus{}6}\PYG{p}{(}\PYG{n}{model}\PYG{o}{=}\PYG{n}{i}\PYG{p}{,} \PYG{n}{clean\PYGZus{}data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}
+  \PYG{n}{columnnr} \PYG{o}{+=} \PYG{l+m+mi}{1}
+
+\PYG{n}{elasticities\PYGZus{}df}\PYG{o}{.}\PYG{n}{to\PYGZus{}latex}\PYG{p}{()}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}\PYGZsh{}\PYGZsh{} 2: Random\PYGZhy{}Coefficients Logit, a.k.a. BLP\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{}Manual BLP:}
+\PYG{n}{X1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{hstack}\PYG{p}{((}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[[}\PYG{l+s+s2}{\PYGZdq{}prices\PYGZdq{}}\PYG{p}{]],} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{get\PYGZus{}dummies}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}brand\PYGZdq{}}\PYG{p}{])))}
+
+\PYG{c+c1}{\PYGZsh{} non\PYGZhy{}linear, note order is different from Nevo paper}
+\PYG{n}{X2} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{[[}\PYG{l+s+s2}{\PYGZdq{}cons\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}prices\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}prom\PYGZus{}\PYGZdq{}}\PYG{p}{]]}\PYG{o}{.}\PYG{n}{to\PYGZus{}numpy}\PYG{p}{()}
+
+\PYG{n}{k} \PYG{o}{=} \PYG{l+m+mi}{2}
+
+\PYG{c+c1}{\PYGZsh{} price}
+\PYG{n}{p} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{prices}\PYG{o}{.}\PYG{n}{values}
+
+\PYG{c+c1}{\PYGZsh{} number of goods per market}
+\PYG{n}{J} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{groupby}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}market\PYGZus{}ids\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()}\PYG{o}{.}\PYG{n}{cons}\PYG{o}{.}\PYG{n}{values}
+
+\PYG{c+c1}{\PYGZsh{} number of simulations per market}
+\PYG{n}{N} \PYG{o}{=} \PYG{l+m+mi}{3}
+
+\PYG{c+c1}{\PYGZsh{} number of markets}
+\PYG{n}{T} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{J}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} find the share of the outside good}
+\PYG{c+c1}{\PYGZsh{} otc\PYGZus{}dataDf[\PYGZdq{}outside\PYGZdq{}] = .9}
+
+\PYG{c+c1}{\PYGZsh{} initial delta\PYGZus{}0 estimate: log(share) \PYGZhy{} log(share outside good)}
+\PYG{n}{delta\PYGZus{}0} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{log}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}shares\PYGZdq{}}\PYG{p}{])} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{log}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}outshr\PYGZdq{}}\PYG{p}{])}
+
+\PYG{c+c1}{\PYGZsh{} markets for itj}
+\PYG{n}{markets} \PYG{o}{=} \PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{market\PYGZus{}ids}\PYG{o}{.}\PYG{n}{values}
+
+\PYG{c+c1}{\PYGZsh{} unique markets}
+\PYG{n}{marks} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{unique}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{market\PYGZus{}ids}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} firms}
+\PYG{n}{firms} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{otc\PYGZus{}dataDf}\PYG{o}{.}\PYG{n}{brand}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,} \PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+
+\PYG{k}{class} \PYG{n+nc}{delta}\PYG{p}{:}
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{delta} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{delta}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} initialize a delta object using the delta\PYGZus{}0 values}
+\PYG{n}{d} \PYG{o}{=} \PYG{n}{delta}\PYG{p}{(}\PYG{n}{delta\PYGZus{}0}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} set seed}
+\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{(}\PYG{l+m+mi}{4096542}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} matrix of simulated values}
+\PYG{c+c1}{\PYGZsh{}  number of rows = number of simulations}
+\PYG{c+c1}{\PYGZsh{}  treat last column is price}
+\PYG{c+c1}{\PYGZsh{} different draws for each market}
+\PYG{n}{V} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{standard\PYGZus{}normal}\PYG{p}{((}\PYG{n}{k} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{*} \PYG{n}{N} \PYG{o}{*} \PYG{n}{T}\PYG{p}{),} \PYG{p}{(}\PYG{n}{T} \PYG{o}{*} \PYG{n}{N}\PYG{p}{,} \PYG{n}{k} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} draws for income if same draws in every market}
+\PYG{n}{otc\PYGZus{}demographicsDf}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}average\PYGZus{}hhincome\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{otc\PYGZus{}demographicsDf}\PYG{p}{[[}\PYG{n}{i} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{columns} \PYG{k}{if} \PYG{n}{i}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}hhincome\PYGZdq{}}\PYG{p}{]]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{incomeMeans} \PYG{o}{=} \PYG{n}{otc\PYGZus{}demographicsDf}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}average\PYGZus{}hhincome\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+
+\PYG{n}{demog} \PYG{o}{=} \PYG{n}{incomeMeans}
+\PYG{n}{demog2} \PYG{o}{=} \PYG{n}{demog} \PYG{o}{*} \PYG{n}{demog}
+
+\PYG{n}{demogDf} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{()}
+\PYG{n}{demogDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}demog\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{demog}
+\PYG{n}{demogDf}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}demog2\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{demog2}
+
+\PYG{n}{demog} \PYG{o}{=} \PYG{n}{demogDf}\PYG{o}{.}\PYG{n}{to\PYGZus{}numpy}\PYG{p}{()}
+
+\PYG{n}{sigma\PYGZus{}v} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{incomeMeans}\PYG{p}{)}
+\PYG{n}{m\PYGZus{}t} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{repeat}\PYG{p}{(}\PYG{n}{incomeMeans}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}@cuda.jit(nopython = True, parallel = True)}
+\PYG{k}{def} \PYG{n+nf}{util\PYGZus{}iter}\PYG{p}{(}\PYG{n}{out}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} first iterate over the individuals }
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{prange}\PYG{p}{(}\PYG{n}{N}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} iterator through t and j}
+        \PYG{n}{tj} \PYG{o}{=} \PYG{l+m+mi}{0}
+        
+        \PYG{c+c1}{\PYGZsh{} iterate over the markets}
+        \PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n}{prange}\PYG{p}{(}\PYG{n}{T}\PYG{p}{):}
+            \PYG{c+c1}{\PYGZsh{} market size of market t}
+            \PYG{n}{mktSize} \PYG{o}{=} \PYG{n}{J}\PYG{p}{[}\PYG{n}{t}\PYG{p}{]}
+            
+            \PYG{c+c1}{\PYGZsh{} iterate over goods in a particular market}
+            \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n}{prange}\PYG{p}{(}\PYG{n}{mktSize}\PYG{p}{):}
+                \PYG{c+c1}{\PYGZsh{} if N * t + i \PYGZlt{} demog.shape[0]:}
+                \PYG{c+c1}{\PYGZsh{} calculate utility}
+                \PYG{c+c1}{\PYGZsh{}  log of the numerator of equation (11) from Aviv\PYGZsq{}s RA guide}
+                \PYG{n}{out}\PYG{p}{[}\PYG{n}{tj}\PYG{p}{,} \PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{delta}\PYG{p}{[}\PYG{n}{tj}\PYG{p}{]} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{x2}\PYG{p}{[}\PYG{n}{tj}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{v}\PYG{p}{[}\PYG{n}{N} \PYG{o}{*} \PYG{n}{t} \PYG{o}{+} \PYG{n}{i} \PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{sigma}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{+}
+                             \PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{pi}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{p}{:],} \PYG{n}{demog}\PYG{p}{[} \PYG{n}{t}\PYG{p}{,:]))} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{x2}\PYG{p}{[}\PYG{n}{tj}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{v}\PYG{p}{[}\PYG{n}{N} \PYG{o}{*} \PYG{n}{t} \PYG{o}{+} \PYG{n}{i}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{*} \PYG{n}{sigma}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}  \PYG{o}{+}
+                            \PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{pi}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,:],} \PYG{n}{demog}\PYG{p}{[} \PYG{n}{t} \PYG{p}{,:]))} \PYG{o}{+} \PYGZbs{}
+                \PYG{n}{x2}\PYG{p}{[}\PYG{n}{tj}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{v}\PYG{p}{[}\PYG{n}{N} \PYG{o}{*} \PYG{n}{t} \PYG{o}{+} \PYG{n}{i}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{*} \PYG{n}{sigma}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]}  \PYG{o}{+}
+                            \PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{pi}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{,:],} \PYG{n}{demog}\PYG{p}{[} \PYG{n}{t} \PYG{p}{,:]))} 
+                \PYG{c+c1}{\PYGZsh{} else:}
+                \PYG{c+c1}{\PYGZsh{} print(f\PYGZdq{}\PYGZob{}t + i\PYGZcb{}\PYGZdq{})}
+
+                \PYG{n}{tj} \PYG{o}{+=} \PYG{l+m+mi}{1}
+    \PYG{k}{return} \PYG{n}{out}
+
+\PYG{c+c1}{\PYGZsh{} computes indirect utility given parameters}
+\PYG{c+c1}{\PYGZsh{}  x: matrix of demand characteristics}
+\PYG{c+c1}{\PYGZsh{}  v: monte carlo draws of N simulations}
+\PYG{c+c1}{\PYGZsh{}  p: price vector}
+\PYG{c+c1}{\PYGZsh{}  delta: guess for the mean utility}
+\PYG{c+c1}{\PYGZsh{}  sigma: non\PYGZhy{}linear sigma (sigma \PYGZhy{} can think of as stdev\PYGZsq{}s)}
+\PYG{c+c1}{\PYGZsh{}  J: vector of number of goods per market}
+\PYG{c+c1}{\PYGZsh{}  T: numer of markets}
+\PYG{c+c1}{\PYGZsh{}  N: number of simulations}
+
+\PYG{c+c1}{\PYGZsh{}@cuda.jit}
+\PYG{k}{def} \PYG{n+nf}{compute\PYGZus{}indirect\PYGZus{}utility}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} make sure sigma are positive}
+    \PYG{n}{sigma} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{sigma}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} output matrix}
+    \PYG{n}{out} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n+nb}{sum}\PYG{p}{(}\PYG{n}{J}\PYG{p}{),} \PYG{n}{N}\PYG{p}{))}
+    
+    \PYG{c+c1}{\PYGZsh{} call the iteration function to calculate utilities}
+    \PYG{n}{out} \PYG{o}{=} \PYG{n}{util\PYGZus{}iter}\PYG{p}{(}\PYG{n}{out}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+     
+    \PYG{k}{return} \PYG{n}{out}
+
+
+
+\PYG{c+c1}{\PYGZsh{} computes the implied shares of goods in each market given inputs}
+\PYG{c+c1}{\PYGZsh{} same inputs as above function}
+
+\PYG{c+c1}{\PYGZsh{}@cuda.jit}
+\PYG{k}{def} \PYG{n+nf}{compute\PYGZus{}share}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{):}
+    \PYG{n}{q} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{J}\PYG{p}{),} \PYG{n}{N}\PYG{p}{))}
+    
+    \PYG{c+c1}{\PYGZsh{} obtain vector of indirect utilities}
+    \PYG{n}{u} \PYG{o}{=} \PYG{n}{compute\PYGZus{}indirect\PYGZus{}utility}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} exponentiate the utilities}
+    \PYG{n}{exp\PYGZus{}u} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{n}{u}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} pointer to first good in the market}
+    \PYG{n}{first\PYGZus{}good} \PYG{o}{=} \PYG{l+m+mi}{0}
+            
+    \PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{T}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} market size of market t}
+        \PYG{n}{mktSize} \PYG{o}{=} \PYG{n}{J}\PYG{p}{[}\PYG{n}{t}\PYG{p}{]}
+
+        \PYG{c+c1}{\PYGZsh{} calculate the numerator of the share eq}
+        \PYG{n}{numer} \PYG{o}{=} \PYG{n}{exp\PYGZus{}u}\PYG{p}{[}\PYG{n}{first\PYGZus{}good}\PYG{p}{:}\PYG{n}{first\PYGZus{}good} \PYG{o}{+} \PYG{n}{mktSize}\PYG{p}{,:]}
+
+        \PYG{c+c1}{\PYGZsh{} calculate the denom of the share eq}
+        \PYG{n}{denom} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{o}{+} \PYG{n}{numer}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{axis} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{)}    
+          
+        \PYG{c+c1}{\PYGZsh{} calculate the quantity each indv purchases of each good in each market}
+        \PYG{n}{q}\PYG{p}{[}\PYG{n}{first\PYGZus{}good}\PYG{p}{:}\PYG{n}{first\PYGZus{}good} \PYG{o}{+} \PYG{n}{mktSize}\PYG{p}{,:]} \PYG{o}{=} \PYG{n}{numer}\PYG{o}{/}\PYG{n}{denom}
+        
+        \PYG{n}{first\PYGZus{}good} \PYG{o}{+=} \PYG{n}{mktSize}
+    
+    \PYG{c+c1}{\PYGZsh{} to obtain shares, assume that each simulation carries the same weight.}
+    \PYG{c+c1}{\PYGZsh{} this averages each row, which is essentially computing the sahres for each}
+    \PYG{c+c1}{\PYGZsh{}  good in each market. }
+    \PYG{n}{s} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{matmul}\PYG{p}{(}\PYG{n}{q}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{repeat}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{N}\PYG{p}{,} \PYG{n}{N}\PYG{p}{))}
+    
+    \PYG{k}{return} \PYG{p}{[}\PYG{n}{q}\PYG{p}{,}\PYG{n}{s}\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{}@cuda.jit}
+\PYG{k}{def} \PYG{n+nf}{solve\PYGZus{}delta}\PYG{p}{(}\PYG{n}{s}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{n}{tol}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} define the tolerance variable}
+    \PYG{n}{eps} \PYG{o}{=} \PYG{l+m+mi}{10}
+    
+    \PYG{c+c1}{\PYGZsh{} renaming delta as delta\PYGZca{}r}
+    \PYG{n}{delta\PYGZus{}old} \PYG{o}{=} \PYG{n}{delta}
+    
+    \PYG{k}{while} \PYG{n}{eps} \PYG{o}{\PYGZgt{}} \PYG{n}{tol}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Aviv\PYGZsq{}s step 1: obtain predicted shares and quantities}
+        \PYG{n}{q\PYGZus{}s} \PYG{o}{=} \PYG{n}{compute\PYGZus{}share}\PYG{p}{(}\PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{delta\PYGZus{}old}\PYG{p}{,} 
+                            \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+        
+        \PYG{c+c1}{\PYGZsh{} extract the shares}
+        \PYG{n}{sigma\PYGZus{}jt} \PYG{o}{=} \PYG{n}{q\PYGZus{}s}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+        
+        \PYG{c+c1}{\PYGZsh{} step 2: use contraction mapping to find delta}
+        \PYG{n}{delta\PYGZus{}new} \PYG{o}{=} \PYG{n}{delta\PYGZus{}old} \PYG{o}{+} \PYG{n}{np}\PYG{o}{.}\PYG{n}{log}\PYG{p}{(}\PYG{n}{s}\PYG{o}{/}\PYG{n}{sigma\PYGZus{}jt}\PYG{p}{)}
+        
+        \PYG{c+c1}{\PYGZsh{} update tolerance}
+        \PYG{n}{eps} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{delta\PYGZus{}new} \PYG{o}{\PYGZhy{}} \PYG{n}{delta\PYGZus{}old}\PYG{p}{))}
+        
+        \PYG{n}{delta\PYGZus{}old} \PYG{o}{=} \PYG{n}{delta\PYGZus{}new}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{()}
+    
+    \PYG{k}{return} \PYG{n}{delta\PYGZus{}old}
+
+\PYG{c+c1}{\PYGZsh{} This is the objective function that we optimize the non\PYGZhy{}linear parameters over}
+\PYG{k}{def} \PYG{n+nf}{objective}\PYG{p}{(}\PYG{n}{params}\PYG{p}{,} \PYG{n}{s}\PYG{p}{,} \PYG{n}{x1}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{n}{marks}\PYG{p}{,} \PYG{n}{markets}\PYG{p}{,} \PYG{n}{tol}\PYG{p}{,} 
+              \PYG{n}{Z}\PYG{p}{,} \PYG{n}{weigh}\PYG{p}{,} \PYG{n}{firms}\PYG{p}{):}
+    
+    \PYG{c+c1}{\PYGZsh{} optim flattens the params, so we have to redefine inside }
+    \PYG{n}{sigma} \PYG{o}{=} \PYG{n}{params}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{l+m+mi}{3}\PYG{p}{]}
+
+    \PYG{n}{alpha} \PYG{o}{=} \PYG{n}{sigma}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+    
+    \PYG{n}{pi} \PYG{o}{=} \PYG{n}{params}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{))}
+    
+    \PYG{c+c1}{\PYGZsh{} number of observation JxT}
+    \PYG{n}{obs} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{J}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} force these params to be 0:}
+    
+    \PYG{k}{if} \PYG{n}{np}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{n}{sigma}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{0}\PYG{p}{:}
+        \PYG{k}{return} \PYG{l+m+mf}{1e20}
+    
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Aviv\PYGZsq{}s step 1 \PYGZam{} 2:}
+        \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta} \PYG{o}{=} \PYG{n}{solve\PYGZus{}delta}\PYG{p}{(}\PYG{n}{s}\PYG{p}{,} \PYG{n}{x2}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{n}{tol}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} since we are using both demand and supply side variables,}
+        \PYG{c+c1}{\PYGZsh{}  we want to stack the estimated delta and estimated mc}
+        \PYG{n}{y2} \PYG{o}{=} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+
+        \PYG{c+c1}{\PYGZsh{} get linear parameters (this FOC is from Aviv\PYGZsq{}s appendix)}
+        \PYG{n}{b} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{x1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{weigh} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{x1}\PYG{p}{)} \PYG{o}{@} \PYG{p}{(}\PYG{n}{x1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{weigh} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{y2}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Step 3: get the error term xi (also called omega)}
+        \PYG{n}{xi\PYGZus{}w} \PYG{o}{=} \PYG{n}{y2} \PYG{o}{\PYGZhy{}} \PYG{n}{x1} \PYG{o}{@} \PYG{n}{b}
+
+        \PYG{n}{g} \PYG{o}{=} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{xi\PYGZus{}w} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{size}\PYG{p}{(}\PYG{n}{xi\PYGZus{}w}\PYG{p}{,} \PYG{n}{axis} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{)}
+
+        \PYG{n}{obj} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{obs} \PYG{o}{**} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{g}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{weigh} \PYG{o}{@} \PYG{n}{g}\PYG{p}{)}
+        
+        \PYG{k}{return} \PYG{n}{obj}
+
+\PYG{n}{demand\PYGZus{}inst\PYGZus{}cols} \PYG{o}{=} \PYG{p}{[}\PYG{n}{i} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{otc\PYGZus{}dataInstrumentsDf}\PYG{o}{.}\PYG{n}{columns} \PYG{k}{if} \PYG{n}{i}\PYG{p}{[:}\PYG{l+m+mi}{10}\PYG{p}{]} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}pricestore\PYGZdq{}}\PYG{p}{]}
+\PYG{n}{Z} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{hstack}\PYG{p}{((}\PYG{n}{otc\PYGZus{}dataInstrumentsDf}\PYG{p}{[}\PYG{n}{demand\PYGZus{}inst\PYGZus{}cols}\PYG{p}{],} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{get\PYGZus{}dummies}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}product\PYGZus{}ids\PYGZdq{}}\PYG{p}{])))}
+
+\PYG{c+c1}{\PYGZsh{} linear parameters}
+\PYG{c+c1}{\PYGZsh{}  this is the FOC on page 5 of Aviv\PYGZsq{}s Appendix}
+\PYG{c+c1}{\PYGZsh{} compare parameters to Table iv of BLP}
+\PYG{c+c1}{\PYGZsh{}  first 5 are the demand side means}
+\PYG{c+c1}{\PYGZsh{}  last 6 are the cost side params}
+
+
+\PYG{c+c1}{\PYGZsh{} initial estimates for sigma}
+\PYG{n}{sigma} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{} initial estimates for pi, by row}
+\PYG{n}{pi1} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+\PYG{n}{pi2} \PYG{o}{=}   \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+
+
+\PYG{c+c1}{\PYGZsh{} optim must read all params in as a one dimensional vector}
+\PYG{n}{params} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{hstack}\PYG{p}{((}\PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi1}\PYG{p}{,} \PYG{n}{pi2}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} Recommended initial weighting matrix from Aviv\PYGZsq{}s appendix}
+\PYG{n}{w1} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z}\PYG{p}{)}
+
+
+
+\PYG{n}{y2} \PYG{o}{=} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{))}
+\PYG{n}{b} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{X1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{X1}\PYG{p}{)} \PYG{o}{@} \PYG{p}{(}\PYG{n}{X1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{y2}\PYG{p}{)}
+\PYG{n}{b}
+
+\PYG{n}{obj} \PYG{o}{=} \PYG{n}{objective}\PYG{p}{(}\PYG{n}{params}\PYG{p}{,}
+                \PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{shares}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,}
+                \PYG{n}{X1}\PYG{p}{,} \PYG{n}{X2}\PYG{p}{,}
+                \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,}
+                \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,}
+                \PYG{n}{marks}\PYG{p}{,} \PYG{n}{markets}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}6}\PYG{p}{,}
+                \PYG{n}{Z}\PYG{p}{,} \PYG{n}{w1}\PYG{p}{,} \PYG{n}{firms}\PYG{p}{)}
+
+\PYG{n}{pi} \PYG{o}{=} \PYG{n}{params}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{))}
+
+
+\PYG{n}{util} \PYG{o}{=} \PYG{n}{compute\PYGZus{}indirect\PYGZus{}utility}\PYG{p}{(}\PYG{n}{X2}\PYG{p}{,} \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} 
+                         \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} }
+\PYG{c+c1}{\PYGZsh{} }
+\PYG{c+c1}{\PYGZsh{} }
+\PYG{n}{share} \PYG{o}{=} \PYG{n}{compute\PYGZus{}share}\PYG{p}{(}\PYG{n}{X2}\PYG{p}{,} \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} 
+                      \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} 
+                      \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} }
+\PYG{n}{delta} \PYG{o}{=} \PYG{n}{solve\PYGZus{}delta}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{shares}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,}
+                    \PYG{n}{X2}\PYG{p}{,} \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} 
+                    \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{,} \PYG{n}{pi}\PYG{p}{,} 
+                    \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{)}
+
+\PYG{n}{delta}
+
+\PYG{n}{res\PYGZus{}init\PYGZus{}wt} \PYG{o}{=} \PYG{n}{minimize}\PYG{p}{(}\PYG{n}{objective}\PYG{p}{,}
+                      \PYG{n}{params}\PYG{p}{,} 
+                      \PYG{n}{args} \PYG{o}{=} \PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{shares}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,} 
+                            \PYG{n}{X1}\PYG{p}{,} \PYG{n}{X2}\PYG{p}{,} 
+                            \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} 
+                            \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} 
+                            \PYG{n}{marks}\PYG{p}{,} \PYG{n}{markets}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{,} 
+                            \PYG{n}{Z}\PYG{p}{,} \PYG{n}{w1}\PYG{p}{,} \PYG{n}{firms}\PYG{p}{),} 
+                      \PYG{n}{method} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Nelder\PYGZhy{}Mead\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{res\PYGZus{}init\PYGZus{}wt}
+
+\PYG{n}{obs} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{J}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} approximate optimal weighting matrix}
+\PYG{n}{params\PYGZus{}2} \PYG{o}{=} \PYG{n}{res\PYGZus{}init\PYGZus{}wt}\PYG{o}{.}\PYG{n}{x}
+\PYG{n}{sigma\PYGZus{}2} \PYG{o}{=} \PYG{n}{params\PYGZus{}2}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{l+m+mi}{4}\PYG{p}{]}
+\PYG{n}{pi\PYGZus{}2} \PYG{o}{=} \PYG{n}{params\PYGZus{}2}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{))}
+
+
+\PYG{c+c1}{\PYGZsh{} calculate mean utility given the optimal parameters (with id weighting matrix)}
+\PYG{n}{d}\PYG{o}{.}\PYG{n}{delta} \PYG{o}{=} \PYG{n}{solve\PYGZus{}delta}\PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{shares}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,}
+                    \PYG{n}{X2}\PYG{p}{,} \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} 
+                    \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma\PYGZus{}2}\PYG{p}{,} \PYG{n}{pi\PYGZus{}2}\PYG{p}{,} 
+                    \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} since we are using both demand and supply side variables,}
+\PYG{c+c1}{\PYGZsh{}  we want to stack the estimated delta and estimated mc}
+\PYG{n}{y2} \PYG{o}{=} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} this is the first order condition that solves for the linear parameters}
+\PYG{n}{b} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{X1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{w1} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{X1}\PYG{p}{)} \PYG{o}{@} \PYG{p}{(}\PYG{n}{X1}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{Z} \PYG{o}{@} \PYG{n}{w1} \PYG{o}{@} \PYG{n}{Z}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{y2}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} obtain the error}
+\PYG{n}{xi\PYGZus{}w} \PYG{o}{=} \PYG{n}{y2} \PYG{o}{\PYGZhy{}} \PYG{n}{X1} \PYG{o}{@} \PYG{n}{b}
+
+\PYG{c+c1}{\PYGZsh{} update weighting matrix}
+\PYG{n}{g\PYGZus{}ind} \PYG{o}{=} \PYG{n}{Z} \PYG{o}{*} \PYG{n}{xi\PYGZus{}w}
+\PYG{n}{vg} \PYG{o}{=} \PYG{n}{g\PYGZus{}ind}\PYG{o}{.}\PYG{n}{T} \PYG{o}{@} \PYG{n}{g\PYGZus{}ind} \PYG{o}{/} \PYG{n}{obs}
+
+\PYG{c+c1}{\PYGZsh{} obtain optimal weighting matrix}
+\PYG{n}{weight} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{vg}\PYG{p}{)}
+
+\PYG{n}{res} \PYG{o}{=} \PYG{n}{minimize}\PYG{p}{(}\PYG{n}{objective}\PYG{p}{,}
+              \PYG{n}{params}\PYG{p}{,} 
+              \PYG{n}{args} \PYG{o}{=} \PYG{p}{(}\PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{shares}\PYG{o}{.}\PYG{n}{values}\PYG{p}{,} 
+                    \PYG{n}{X1}\PYG{p}{,} \PYG{n}{X2}\PYG{p}{,} 
+                    \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} 
+                    \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} 
+                    \PYG{n}{marks}\PYG{p}{,} \PYG{n}{markets}\PYG{p}{,} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{,} 
+                    \PYG{n}{Z}\PYG{p}{,} \PYG{n}{weight}\PYG{p}{,} \PYG{n}{firms}\PYG{p}{),} 
+              \PYG{n}{method} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Nelder\PYGZhy{}Mead\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{params\PYGZus{}3}
+
+\PYG{n}{params\PYGZus{}3} \PYG{o}{=} \PYG{n}{res}\PYG{o}{.}\PYG{n}{x}
+\PYG{n}{sigma\PYGZus{}3} \PYG{o}{=} \PYG{n}{params\PYGZus{}3}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{l+m+mi}{3}\PYG{p}{]}
+\PYG{n}{pi\PYGZus{}3} \PYG{o}{=} \PYG{n}{params\PYGZus{}3}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{:]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} obtain the actual implied quantities and shares from converged delta}
+\PYG{n}{q\PYGZus{}s} \PYG{o}{=} \PYG{n}{compute\PYGZus{}share}\PYG{p}{(}\PYG{n}{X2}\PYG{p}{,} \PYG{n}{V}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{demog}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{delta}\PYG{p}{,} \PYG{n}{sigma\PYGZus{}3}\PYG{p}{,} \PYG{n}{pi\PYGZus{}3}\PYG{p}{,} \PYG{n}{J}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{n}{N}\PYG{p}{)}
+
+\PYG{n}{delta}
+
+\PYG{n}{q\PYGZus{}s}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+
+\PYG{n}{sigma\PYGZus{}3}
+
+\PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{pi\PYGZus{}3}\PYG{p}{)}
+
+\PYG{n}{b}
+
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10} \PYG{o}{=} \PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{full\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}week\PYGZsq{}}\PYG{p}{]}\PYG{o}{==}\PYG{l+m+mi}{10}\PYG{p}{]}\PYG{o}{.}\PYG{n}{reset\PYGZus{}index}\PYG{p}{()}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}store\PYGZsq{}}\PYG{p}{]}\PYG{o}{==}\PYG{l+m+mi}{9}\PYG{p}{]}\PYG{o}{.}\PYG{n}{reset\PYGZus{}index}\PYG{p}{()}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}relative\PYGZus{}share\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{]}\PYG{o}{/}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{()}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}average\PYGZus{}income\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[[}\PYG{n}{i} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{o}{.}\PYG{n}{columns} \PYG{k}{if} \PYG{n}{i}\PYG{p}{[:}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}hh\PYGZdq{}}\PYG{p}{]]}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{()}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}
+
+\PYG{n}{sigma\PYGZus{}I} \PYG{o}{=} \PYG{l+m+mf}{0.005161}
+\PYG{n}{sigma\PYGZus{}I\PYGZus{}sq} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.121263}
+\PYG{n}{alpha} \PYG{o}{=} \PYG{l+m+mf}{1.67671625}
+
+\PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}elasticity\PYGZus{}matrix}\PYG{p}{(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{o}{=}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{):}
+  \PYG{n}{my\PYGZus{}etas} \PYG{o}{=} \PYG{p}{[]}
+  \PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{()}
+  \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{o}{.}\PYG{n}{index}\PYG{p}{:}
+    \PYG{n}{eta\PYGZus{}j} \PYG{o}{=} \PYG{p}{[]}
+    \PYG{k}{for} \PYG{n}{k} \PYG{o+ow}{in} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{o}{.}\PYG{n}{index}\PYG{p}{:}
+      \PYG{k}{if} \PYG{n}{j} \PYG{o}{!=} \PYG{n}{k}\PYG{p}{:}
+        \PYG{n}{eta} \PYG{o}{=} \PYG{p}{(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]}\PYG{o}{/}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{])} \PYG{o}{*} \PYGZbs{}
+          \PYG{p}{(}\PYG{n}{alpha} \PYG{o}{+} \PYG{n}{sigma\PYGZus{}I} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}average\PYGZus{}income\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]} \PYG{o}{+} \PYG{n}{sigma\PYGZus{}I\PYGZus{}sq} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}average\PYGZus{}income\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{*} \PYGZbs{}
+          \PYG{p}{(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{j}\PYG{p}{])}
+      \PYG{k}{if} \PYG{n}{j} \PYG{o}{==} \PYG{n}{k}\PYG{p}{:}
+        \PYG{n}{eta} \PYG{o}{=} \PYG{p}{(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]}\PYG{o}{/}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{])} \PYG{o}{*} \PYGZbs{}
+          \PYG{p}{(}\PYG{n}{alpha} \PYG{o}{+} \PYG{n}{sigma\PYGZus{}I} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}average\PYGZus{}income\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]} \PYG{o}{+} \PYG{n}{sigma\PYGZus{}I\PYGZus{}sq} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}average\PYGZus{}income\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{*} \PYGZbs{}
+          \PYG{p}{(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{]} \PYG{o}{*} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{j}\PYG{p}{]} \PYG{o}{+} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{][}\PYG{n}{k}\PYG{p}{])}
+      \PYG{n}{eta\PYGZus{}j}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{eta}\PYG{p}{)}
+    \PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix}\PYG{p}{[}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{j}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{eta\PYGZus{}j}
+  \PYG{k}{return} \PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix}
+
+
+\PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix} \PYG{o}{=} \PYG{n}{calculate\PYGZus{}elasticity\PYGZus{}matrix}\PYG{p}{()}
+\PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix}
+
+\PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}mc}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{elasticity\PYGZus{}df}\PYG{o}{=}\PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix}\PYG{p}{):}
+  \PYG{n}{elasticities} \PYG{o}{=} \PYG{n}{elasticity\PYGZus{}df}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{diagonal}\PYG{p}{()}
+  \PYG{n}{shares} \PYG{o}{=} \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{]}
+  \PYG{n}{prices} \PYG{o}{=} \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{]}
+  \PYG{n}{marginal\PYGZus{}costs} \PYG{o}{=} \PYG{p}{[]}
+  \PYG{n}{k} \PYG{o}{=} \PYG{l+m+mi}{0}
+  \PYG{k}{while} \PYG{n}{k} \PYG{o}{\PYGZlt{}} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{index}\PYG{p}{):}
+    \PYG{n}{mc} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{o}{/} \PYG{n}{elasticities}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{*} \PYG{n}{shares}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{/} \PYG{n}{prices}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{+} \PYG{n}{prices}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}
+    \PYG{n}{marginal\PYGZus{}costs}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{mc}\PYG{p}{)}
+    \PYG{n}{k} \PYG{o}{+=} \PYG{l+m+mi}{1}
+  \PYG{k}{return} \PYG{n}{marginal\PYGZus{}costs}
+
+\PYG{n}{marginal\PYGZus{}costs} \PYG{o}{=} \PYG{n}{calculate\PYGZus{}mc}\PYG{p}{(}\PYG{n}{df}\PYG{o}{=}\PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}\PYG{p}{)}
+\PYG{n}{marginal\PYGZus{}costs}
+
+\PYG{n}{marginal\PYGZus{}costs\PYGZus{}df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{data}\PYG{o}{=}\PYG{n}{marginal\PYGZus{}costs}\PYG{p}{)}
+\PYG{n}{marginal\PYGZus{}costs\PYGZus{}df}\PYG{o}{.}\PYG{n}{to\PYGZus{}latex}\PYG{p}{()}
+
+\PYG{n}{mc} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{o}{/} \PYG{p}{(}\PYG{n}{elasticity}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{*} \PYG{n}{share}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{/} \PYG{n}{price}\PYG{p}{[}\PYG{n}{k}\PYG{p}{])}
+
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10\PYGZus{}store9}
+\PYG{n}{elasticity\PYGZus{}df} \PYG{o}{=} \PYG{n}{Q2\PYGZus{}elasticty\PYGZus{}matrix}
+\PYG{n}{elasticities} \PYG{o}{=} \PYG{n}{elasticity\PYGZus{}df}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{diagonal}\PYG{p}{()}
+
+
+\PYG{n}{marginal\PYGZus{}costs}
+
+\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{elasticities}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Define the function to retrieve costs}
+\PYG{k}{def} \PYG{n+nf}{find\PYGZus{}costs}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,} \PYG{n}{ahat}\PYG{p}{,} \PYG{n}{price}\PYG{p}{,} \PYG{n}{share}\PYG{p}{,} \PYG{n}{owner}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Solve for marginal costs}
+\PYG{l+s+sd}{    nobs = number of products in market}
+\PYG{l+s+sd}{    ahat = estimated price coefficient}
+\PYG{l+s+sd}{    price = vector of prices in market}
+\PYG{l+s+sd}{    share = market shares in market}
+\PYG{l+s+sd}{    owner = ownership vector }
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{c+c1}{\PYGZsh{} Initialize dsdp}
+    \PYG{n}{temp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{nobs}\PYG{p}{))}
+    \PYG{n}{dsdp} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} dsdp matrix where element (row=j,col=r) = ds\PYGZus{}r/dp\PYGZus{}j}
+    \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+        \PYG{k}{for} \PYG{n}{r} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+            \PYG{k}{if} \PYG{p}{(}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{==}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]):}
+                \PYG{k}{if} \PYG{p}{(}\PYG{n}{j}\PYG{o}{==}\PYG{n}{r}\PYG{p}{):}
+                    \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{])}
+                \PYG{k}{else}\PYG{p}{:}
+                    \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]}
+        
+    \PYG{c+c1}{\PYGZsh{} Apply inverse. If you\PYGZsq{}ve had linear algebra, you\PYGZsq{}ll see what I\PYGZsq{}m doin.}
+    \PYG{c+c1}{\PYGZsh{} If not, take my word for it: We\PYGZsq{}re just rearranging the system of FOCs}
+    \PYG{c+c1}{\PYGZsh{} to solve for c just like you would in the monopolist case.}
+    \PYG{n}{inv\PYGZus{}dsdp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{dsdp}\PYG{p}{)} 
+      
+    \PYG{c+c1}{\PYGZsh{} Solve for dollar markups.}
+    \PYG{n}{markup} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{inv\PYGZus{}dsdp}\PYG{p}{,}\PYG{n}{share}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} Solve for chat }
+    \PYG{n}{chat} \PYG{o}{=} \PYG{n}{price} \PYG{o}{\PYGZhy{}} \PYG{n}{markup} 
+    
+    \PYG{k}{return} \PYG{n}{chat}
+
+\PYG{n}{parans\PYGZus{}M1} \PYG{o}{=} \PYG{n}{res\PYGZus{}log3}\PYG{o}{.}\PYG{n}{params}
+\PYG{n}{parans\PYGZus{}M1}
+
+\PYG{c+c1}{\PYGZsh{} restrict data to week 10}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10} \PYG{o}{=} \PYG{n}{full\PYGZus{}data}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[}\PYG{n}{full\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}week\PYGZsq{}}\PYG{p}{]}\PYG{o}{==}\PYG{l+m+mi}{10}\PYG{p}{]}\PYG{o}{.}\PYG{n}{reset\PYGZus{}index}\PYG{p}{()}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}chat\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+\PYG{c+c1}{\PYGZsh{} Identify inputs}
+\PYG{n}{ahat} \PYG{o}{=} \PYG{n}{parans\PYGZus{}M1}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{price} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{share} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}shares\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{owner} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{nobs} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{share}\PYG{p}{)}
+
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}chat\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{find\PYGZus{}costs}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,} \PYG{n}{ahat}\PYG{p}{,} \PYG{n}{price}\PYG{p}{,} \PYG{n}{share}\PYG{p}{,} \PYG{n}{owner}\PYG{p}{)}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}chat\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{()}
+
+\PYG{c+c1}{\PYGZsh{} Define function to solve for market shares}
+\PYG{k}{def} \PYG{n+nf}{mkt\PYGZus{}shar}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{ahat}\PYG{p}{,}\PYG{n}{price}\PYG{p}{,}\PYG{n}{util}\PYG{p}{):}
+    \PYG{n}{numerator} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{n}{ahat}\PYG{o}{*}\PYG{n}{price} \PYG{o}{+} \PYG{n}{util}\PYG{p}{)}
+    \PYG{n}{denominator} \PYG{o}{=} \PYG{n+nb}{sum}\PYG{p}{(}\PYG{n}{numerator}\PYG{p}{)}
+    \PYG{n}{denominator} \PYG{o}{=} \PYG{n}{denominator} \PYG{o}{+} \PYG{l+m+mi}{1}
+    \PYG{n}{share} \PYG{o}{=} \PYG{n}{numerator}\PYG{o}{/}\PYG{n}{denominator}
+    \PYG{k}{return} \PYG{n}{share}
+
+\PYG{c+c1}{\PYGZsh{} Define the system of FOCs}
+\PYG{k}{def} \PYG{n+nf}{FOC}\PYG{p}{(}\PYG{n}{price}\PYG{p}{,} \PYG{n}{nobs}\PYG{p}{,} \PYG{n}{ahat}\PYG{p}{,} \PYG{n}{util}\PYG{p}{,} \PYG{n}{owner}\PYG{p}{,} \PYG{n}{chat}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Solve for the FOCs at a price guess}
+\PYG{l+s+sd}{    nobs = number of products in market}
+\PYG{l+s+sd}{    ahat = estimated price coefficient}
+\PYG{l+s+sd}{    price = vector of prices in market}
+\PYG{l+s+sd}{    util = X\PYGZhy{}times\PYGZhy{}Beta}
+\PYG{l+s+sd}{    owner = ownership vector }
+\PYG{l+s+sd}{    chat = marginal cost estimate}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    
+    \PYG{c+c1}{\PYGZsh{} Solve for market share conditional on price}
+    \PYG{n}{share} \PYG{o}{=} \PYG{n}{mkt\PYGZus{}shar}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{ahat}\PYG{p}{,}\PYG{n}{price}\PYG{p}{,}\PYG{n}{util}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} Initialize dsdp}
+    \PYG{n}{temp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{nobs}\PYG{p}{))}
+    \PYG{n}{dsdp} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} dsdp matrix where element (row=j,col=r) = ds\PYGZus{}r/dp\PYGZus{}j}
+    \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+        \PYG{k}{for} \PYG{n}{r} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+            \PYG{k}{if} \PYG{p}{(}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{==}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]):}
+                \PYG{k}{if} \PYG{p}{(}\PYG{n}{j}\PYG{o}{==}\PYG{n}{r}\PYG{p}{):}
+                    \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{])}
+                \PYG{k}{else}\PYG{p}{:}
+                    \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]}
+        
+    \PYG{c+c1}{\PYGZsh{} Apply inverse. If you\PYGZsq{}ve had linear algebra, you\PYGZsq{}ll see what I\PYGZsq{}m doin.}
+    \PYG{c+c1}{\PYGZsh{} If not, take my word for it: We\PYGZsq{}re just rearranging the system of FOCs}
+    \PYG{c+c1}{\PYGZsh{} to solve for c just like you would in the monopolist case.}
+    \PYG{n}{inv\PYGZus{}dsdp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{dsdp}\PYG{p}{)} 
+      
+    \PYG{c+c1}{\PYGZsh{} Solve for dollar markups.}
+    \PYG{n}{markup} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{inv\PYGZus{}dsdp}\PYG{p}{,}\PYG{n}{share}\PYG{p}{)}
+    
+    \PYG{c+c1}{\PYGZsh{} Solve for residual. If the FOCs jointly hold, this is a vector of zeros}
+    \PYG{n}{resid} \PYG{o}{=} \PYG{n}{price} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{n}{chat} \PYG{o}{+} \PYG{n}{markup}\PYG{p}{)}
+    
+\PYG{c+c1}{\PYGZsh{}    print(sum(resid))}
+          
+    \PYG{k}{return} \PYG{n}{resid}
+
+\PYG{c+c1}{\PYGZsh{} Solve for new prices using a numerical equation solver (fsolve)}
+\PYG{k+kn}{import} \PYG{n+nn}{time}
+\PYG{k+kn}{from} \PYG{n+nn}{scipy.optimize} \PYG{k+kn}{import} \PYG{n}{fsolve}
+
+\PYG{c+c1}{\PYGZsh{} Account for the merger via the ownership matrix}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]}\PYG{o}{==} \PYG{l+m+mi}{2}\PYG{p}{),}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{o}{.}\PYG{n}{loc}\PYG{p}{[(}\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]}\PYG{o}{==} \PYG{l+m+mi}{3}\PYG{p}{),}\PYG{l+s+s1}{\PYGZsq{}brandID\PYGZsq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+\PYG{c+c1}{\PYGZsh{} Define util (X\PYGZhy{}times\PYGZhy{}Beta)}
+\PYG{n}{util} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}Y\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{ahat}\PYG{o}{*}\PYG{n}{price}
+
+\PYG{n}{chat} \PYG{o}{=} \PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}chat\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{p0} \PYG{o}{=} \PYG{n}{price} \PYG{c+c1}{\PYGZsh{} initial guess of equilibrium prices (prices from data)}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}This is a faster way to solve}
+
+\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{k}{def} \PYG{n+nf}{contraction}\PYG{p}{(}\PYG{n}{price}\PYG{p}{,} \PYG{n}{nobs}\PYG{p}{,} \PYG{n}{ahat}\PYG{p}{,} \PYG{n}{util}\PYG{p}{,} \PYG{n}{owner}\PYG{p}{,} \PYG{n}{chat}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Solve for the FOCs at a price guess}
+\PYG{l+s+sd}{    nobs = number of products in market}
+\PYG{l+s+sd}{    ahat = estimated price coefficient}
+\PYG{l+s+sd}{    price = vector of prices in market}
+\PYG{l+s+sd}{    util = X\PYGZhy{}times\PYGZhy{}Beta}
+\PYG{l+s+sd}{    owner = ownership vector }
+\PYG{l+s+sd}{    chat = marginal cost estimate}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n+nb}{iter} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{n}{maxiter} \PYG{o}{=} \PYG{l+m+mi}{1000}
+    \PYG{n}{norm} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{n}{tol} \PYG{o}{=} \PYG{l+m+mf}{1e\PYGZhy{}6}
+    
+    \PYG{n}{pnew} \PYG{o}{=} \PYG{n}{price} \PYG{c+c1}{\PYGZsh{} Initial guess}
+    
+    \PYG{k}{while} \PYG{p}{(}\PYG{n+nb}{iter}\PYG{o}{\PYGZlt{}=}\PYG{n}{maxiter}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{p}{(}\PYG{n}{norm} \PYG{o}{\PYGZgt{}} \PYG{n}{tol}\PYG{p}{):}
+        
+        \PYG{n}{pold} \PYG{o}{=} \PYG{n}{pnew}
+        
+        \PYG{c+c1}{\PYGZsh{} Solve for market share conditional on price}
+        \PYG{n}{share} \PYG{o}{=} \PYG{n}{mkt\PYGZus{}shar}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{ahat}\PYG{p}{,}\PYG{n}{pold}\PYG{p}{,}\PYG{n}{util}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Initialize dsdp}
+        \PYG{n}{temp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{shape}\PYG{o}{=}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{,}\PYG{n}{nobs}\PYG{p}{))}
+        \PYG{n}{dsdp} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} dsdp matrix where element (row=j,col=r) = ds\PYGZus{}r/dp\PYGZus{}j}
+        \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+            \PYG{k}{for} \PYG{n}{r} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nobs}\PYG{p}{):}
+                \PYG{k}{if} \PYG{p}{(}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{==}\PYG{n}{owner}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]):}
+                    \PYG{k}{if} \PYG{p}{(}\PYG{n}{j}\PYG{o}{==}\PYG{n}{r}\PYG{p}{):}
+                        \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{])}
+                    \PYG{k}{else}\PYG{p}{:}
+                        \PYG{n}{dsdp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{][}\PYG{n}{r}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{ahat}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{n}{share}\PYG{o}{.}\PYG{n}{at}\PYG{p}{[}\PYG{n}{r}\PYG{p}{]}
+
+        \PYG{c+c1}{\PYGZsh{} Apply inverse. If you\PYGZsq{}ve had linear algebra, you\PYGZsq{}ll see what I\PYGZsq{}m doin.}
+        \PYG{c+c1}{\PYGZsh{} If not, take my word for it: We\PYGZsq{}re just rearranging the system of FOCs}
+        \PYG{c+c1}{\PYGZsh{} to solve for c just like you would in the monopolist case.}
+        \PYG{n}{inv\PYGZus{}dsdp} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{inv}\PYG{p}{(}\PYG{n}{dsdp}\PYG{p}{)} 
+
+        \PYG{c+c1}{\PYGZsh{} Solve for dollar markups.}
+        \PYG{n}{markup} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{inv\PYGZus{}dsdp}\PYG{p}{,}\PYG{n}{share}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Solve for residual. If the FOCs jointly hold, this is a vector of zeros}
+        \PYG{n}{pnew} \PYG{o}{=} \PYG{n}{chat} \PYG{o}{+} \PYG{n}{markup}
+    
+        \PYG{c+c1}{\PYGZsh{} Check if we\PYGZsq{}re done}
+        \PYG{n}{norm} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{pnew}\PYG{o}{\PYGZhy{}}\PYG{n}{pold}\PYG{p}{))}
+        \PYG{n+nb}{iter} \PYG{o}{=} \PYG{n+nb}{iter} \PYG{o}{+} \PYG{l+m+mi}{1}
+        \PYG{c+c1}{\PYGZsh{}print(norm)}
+          
+    \PYG{k}{return} \PYG{n}{pnew}
+
+\PYG{c+c1}{\PYGZsh{} Solve the faster way}
+\PYG{n}{start\PYGZus{}time} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}  \PYG{c+c1}{\PYGZsh{} Start timer}
+\PYG{n}{p\PYGZus{}prime2} \PYG{o}{=} \PYG{n}{contraction}\PYG{p}{(}\PYG{n}{price}\PYG{p}{,} \PYG{n}{nobs}\PYG{p}{,} \PYG{n}{ahat}\PYG{p}{,} \PYG{n}{util}\PYG{p}{,} \PYG{n}{owner}\PYG{p}{,} \PYG{n}{chat}\PYG{p}{)}
+\PYG{n}{finish\PYGZus{}time} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}  \PYG{c+c1}{\PYGZsh{} end timer}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}FOC Algorithm Finished. Execution Time: }\PYG{l+s+si}{\PYGZob{}0:.2f\PYGZcb{}}\PYG{l+s+s1}{ seconds\PYGZsq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{n}{finish\PYGZus{}time}\PYG{o}{\PYGZhy{}}\PYG{n}{start\PYGZus{}time}\PYG{p}{))}
+
+\PYG{n}{pchange} \PYG{o}{=} \PYG{l+m+mi}{100}\PYG{o}{*}\PYG{p}{(}\PYG{n}{p\PYGZus{}prime2}\PYG{o}{/}\PYG{n}{price} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} Percentage change}
+\PYG{n}{p\PYGZus{}delta} \PYG{o}{=} \PYG{n}{p\PYGZus{}prime2}\PYG{o}{\PYGZhy{}}\PYG{n}{price}
+
+\PYG{c+c1}{\PYGZsh{} Raw stats}
+\PYG{n}{pchange}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{()}
+
+\PYG{c+c1}{\PYGZsh{} Need to merge prices back into frame}
+
+\PYG{c+c1}{\PYGZsh{} price changes in week 10 \PYGZhy{} store 9 }
+\PYG{n}{p\PYGZus{}prime2}\PYG{o}{.}\PYG{n}{name} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}new\PYGZus{}prices\PYGZsq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{([}\PYG{n}{full\PYGZus{}data\PYGZus{}w10}\PYG{p}{,} \PYG{n}{p\PYGZus{}prime2}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{([}\PYG{n}{df}\PYG{p}{,} \PYG{n}{p\PYGZus{}delta}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{rename}\PYG{p}{(\PYGZob{}}\PYG{l+m+mi}{0}\PYG{p}{:} \PYG{l+s+s1}{\PYGZsq{}price\PYGZus{}change\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}product\PYGZus{}ids\PYGZdq{}} \PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}brand\PYGZdq{}}\PYG{p}{\PYGZcb{},} \PYG{n}{axis}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}columns\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{df}\PYG{p}{[}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}store\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mi}{9}\PYG{p}{][[}\PYG{l+s+s1}{\PYGZsq{}store\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}week\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}brand\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}prices\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}new\PYGZus{}prices\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}price\PYGZus{}change\PYGZsq{}}\PYG{p}{]]}
+\end{Verbatim}

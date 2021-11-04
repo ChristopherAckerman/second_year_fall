@@ -156,7 +156,18 @@ These elasticities are not believable. The important/theoretical difference from
 
 \subsection*{Back out the marginal costs for store 9 in week 10. How are they different from wholesale costs?}
 
-We have code that does this (for part 3) but we were unable to run it before turning in the HW. It should be almost exactly the same procedure as in part 3, but we need to use results from the random coefficients model, and we are running into bugs in the code when we do that.
+Since we have a single-ownership structure, we can use scalars everywhere instead of matrices. The expression for marginal cost is then
+\[
+mc = \frac{1}{\eta_k} \cdot \left(\frac{s_k}{p_k}\right) + p_k.
+\]
+
+The marginal costs that we estimate for these firms are
+\begin{table}[htp]
+  \centering
+  \include{2-3.tex}
+\end{table}
+
+These marginal costs are well above the wholesale costs. Because of our incredibly large elasticity estimates, the implied markups in our model are very very small, so $mc \approx p$. However we see that wholesale cost is notably cheaper than actual prices.
 
 \newpage
 \section*{Problem 3}
@@ -170,6 +181,10 @@ We have code that does this (for part 3) but we were unable to run it before tur
 \subsection*{How to predict the change in prices after the merger using the random coefficients model?}
 
 The procedure for predicting the effects of a merger using estimates from the random coefficients model is exactly the same. When we estimate the logit model, we end up with unrealistic elasticities, and hence unrealistic substitution patterns. The random coefficients model gives us a more reasonable matrix of elasticities, but we use it in the same way. When we want to assess the change of moving from two single-product firms to a multi-product firm, we switch from looking at firms that take FOCs with respect to a single price to a single firm that takes FOCs with respect to two prices (the price of each good that it produces). What does this mean? With a more realistic estimate of substitution patterns, we have a better idea of how consumers will respond to changes in prices. Pre-merger, a firm would be ``unwilling'' to raise its price because it would lose customers. Now, however, the merged firm \emph{may} recognize that increasing the price of one of it's products will cause consumers to switch to its other product, so its profit maximizing price may be higher in the merged case than in the pre-merger case. The random coefficients model is giving us a better insight into these actual substitution patterns.
+
+
+\newpage
+\inputminted{python}{blp_hw.py}
 \end{document}
 %%% Local Variables:
 %%% mode: latex

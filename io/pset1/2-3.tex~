@@ -1,0 +1,22 @@
+\begin{tabular}{lr}
+\toprule
+{} &         0 \\
+\midrule
+0  &  3.289996 \\
+1  &  4.869998 \\
+2  &  6.380000 \\
+3  &  2.829996 \\
+4  &  5.289999 \\
+5  &  8.390000 \\
+6  &  2.709997 \\
+7  &  3.339999 \\
+8  &  3.970000 \\
+9  &  1.689992 \\
+10 &  4.490000 \\
+\bottomrule
+\end{tabular}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "ackerman_pset1"
+%%% End:
