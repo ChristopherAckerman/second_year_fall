@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}1.3. Using OLS with price and promotion as product characteristics and store\PYGZhy{}brand}
+\PYG{c+c1}{\PYGZsh{}(the interaction of brand and store) dummies.}
+
+\PYG{n}{res\PYGZus{}log3} \PYG{o}{=} \PYG{n}{smf}\PYG{o}{.}\PYG{n}{ols}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} prices + prom\PYGZus{} + C(brand)*C(store)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\end{Verbatim}

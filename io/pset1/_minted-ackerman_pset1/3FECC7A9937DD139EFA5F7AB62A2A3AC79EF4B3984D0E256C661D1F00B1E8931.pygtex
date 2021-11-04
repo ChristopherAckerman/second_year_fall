@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} OLS with price and promotion as product characteristics and brand dummies}
+\PYG{c+c1}{\PYGZsh{} using wholesale cost as instrument}
+
+\PYG{n}{wholeSale\PYGZus{}IV3} \PYG{o}{=} \PYG{n}{iv}\PYG{o}{.}\PYG{n}{IV2SLS}\PYG{o}{.}\PYG{n}{from\PYGZus{}formula}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} 1 + [prices \PYGZti{} cost\PYGZus{}] + prom\PYGZus{} + C(brand)*C(store)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\end{Verbatim}

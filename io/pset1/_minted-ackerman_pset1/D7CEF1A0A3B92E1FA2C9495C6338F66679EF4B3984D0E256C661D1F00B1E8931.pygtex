@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}1.2: Estimate using OLS with price and promotion as product characteristics and brand dummies.}
+\PYG{n}{res\PYGZus{}log2} \PYG{o}{=} \PYG{n}{smf}\PYG{o}{.}\PYG{n}{ols}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Y \PYGZti{} prices + prom\PYGZus{} + C(brand)\PYGZsq{}}\PYG{p}{,} \PYG{n}{data}\PYG{o}{=}\PYG{n}{otc\PYGZus{}dataDf}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+\end{Verbatim}
