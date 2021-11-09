@@ -1,0 +1,37 @@
+\input{../article_preamble}
+\newtheorem*{definition}{Definition}
+\title{Networks Pset \#1}
+\date{\today}
+\begin{document}
+\author{Chris Ackerman\thanks{I worked on this problem set with Aristotle Magganas, Antonio Martner and Koki Okumura.}}
+
+\maketitle
+\section*{Question 5}
+Without a network, the monopolist solves the problem
+\begin{align*}
+  \max_{p} &\ p \cdot q \tag{Assume $mc = 0$}\\
+  \theta \sim U[0, 1] &\implies q  = 1 - p\\
+  \max_p &\ p \cdot (1 - p)\\
+  \frac{\partial}{\partial p} p - p^2 &= 0 \tag{FOC}\\
+  1 - 2p &= 0\\
+  p &= \frac{1}{2}
+\end{align*}
+Now let's put this on a network. We just need to cook up a counterexample, so here's a funny network that will work. Put all $\theta < \frac{1}{2} + \delta, \delta > 0$ into singletons. Put all $\theta \ge \frac{1}{2} + \delta$ in a completely connected network. Now, as we send $\varepsilon \to 0$ we only hit the giant component (all of the $\theta \in \left[\frac{1}{2} + \delta, 1\right]$). Let's see how the monopolist's price without a network does, and if we can do better.
+\begin{align*}
+  \pi &= p \cdot q\\
+      &= p \cdot \left(1 - \left[\frac{1}{2} + \delta\right]\right)\\
+  &= \left(\frac{1}{2}\right)^2 - \frac{\delta}{2}
+\end{align*}
+But the monopolist can do better! $\delta > 0 \implies \theta > p $ for all the guys that are actually buying this product. Everyone is getting some consumer surplus. We can squeeze \emph{all} of this surplus out of the guy with $\underline{\theta} = \frac{1}{2} + \delta$, and we can squeeze \emph{some} surplus ($\delta$) out of everyone that's buying. Basically, increasing the price to $p^\prime \in \left(\frac{1}{2}, \frac{1}{2} + \delta\right]$ doesn't cause anybody to stop buying the product, but does give a higher per-unit price to the monopolist.
+\begin{align*}
+  \pi^\prime &= p^\prime \cdot q\\
+             &= \underbrace{\left(\frac{1}{2} + \delta\right)}_{\text{higher price}} \underbrace{\left(1 - \left[\frac{1}{2} + \delta\right]\right)}_{\text{same quantity}}\\
+             &= \left(\frac{1}{2}\right)^2 - \frac{\delta}{2} + \underbrace{\delta \left(\frac{1}{2} - \delta\right)}_{\text{additional profit}}\\
+  &> \pi
+\end{align*}
+This holds for all $\delta \in \left(0, \frac{1}{2}\right)$.
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

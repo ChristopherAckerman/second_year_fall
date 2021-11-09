@@ -1,0 +1,15 @@
+\input{../article_preamble}
+\newtheorem*{definition}{Definition}
+\title{Networks Pset \#1}
+\date{\today}
+\begin{document}
+\author{Chris Ackerman\thanks{I worked on this problem set with Aristotle Magganas, Antonio Martner and Koki Okumura.}}
+
+\begin{document}
+\maketitle
+\section*{Question 5}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
