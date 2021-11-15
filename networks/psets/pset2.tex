@@ -6,6 +6,17 @@
 \author{Chris Ackerman\thanks{I worked on this problem set with Aristotle Magganas, Antonio Martner and Koki Okumura.}}
 
 \maketitle
+
+\section*{Question 3}
+
+If we make the two leftmost red nodes green, the resulting green nodes are $\frac{2}{3}$-cohesive, and the remaining red nodes are $\frac{3}{4}$-cohesive. The original green nodes only have green neighbors, and the two new ones each have $2$ green neighbors and a single red neighbor, so the green subnetwork is $\frac{2}{3}$-cohesive. Two red nodes are connected to a green node, but they are each connected to three red nodes, so the new red subnetwork is $\frac{3}{4}$-cohesive.
+
+\section*{Question 4}
+\begin{enumerate}[label=\alph*)]
+\item The highest $q^\ast(g)$ we can achieve is $\frac{1}{2}$, and the line and circle networks will both achieve $q^\ast(g) = \frac{1}{2}$.
+  \item The lowest $q^\ast(g)$ we can achieve is $\frac{1}{9}$, and the complete graph achieves this $q^\ast(g)$.
+\end{enumerate}
+
 \section*{Question 5}
 Without a network, the monopolist solves the problem
 \begin{align*}
@@ -30,6 +41,16 @@ But the monopolist can do better! $\delta > 0 \implies \theta > p $ for all the 
   &> \pi
 \end{align*}
 This holds for all $\delta \in \left(0, \frac{1}{2}\right)$.
+
+\section*{Question 7}
+Proof by contradiction and induction. Choose agent $i_1$ in a finite network, and suppose he is \emph{not} in a strongly connected or closed group, and does \emph{not} have a directed path to an agent in a strongly connected group. Then, there exist two nodes $i_2$ and $i_3$ such that
+\begin{enumerate}
+\item there is a path from $i_1 \to i_2$
+\item $i_2$ is not in a strongly connected and closed group
+\item there is a path from $i_2 \to i_3$
+  \item $i_3$ is not in a strongly connected and closed group
+\end{enumerate}
+By induction we can keep going, but then the network isn't finite. Therefore, agent $i_1$ is either in a strongly connected and closed group or has a directed path to an agent in a strongly connected and closed group. And if the agent is either in a strongly connected and closed group or has a directed path into one, there must be at least one strongly connected and closed group.
 \end{document}
 %%% Local Variables:
 %%% mode: latex

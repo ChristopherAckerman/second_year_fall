@@ -1,0 +1,161 @@
+\documentclass{beamer}
+\input{../slides_preamble}
+\title{The Rise of Market Power and the Macroeconomic Implications}
+\author{De Loecker, Eeckout, and Unger}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{Overview}
+  \begin{itemize}
+  \item Aggregate markups have risen from 21\% to 61\% since the 1980s
+    \vitem \emph{Median} markups haven't changed
+    \vitem The entire change in markup is due to a rise in markups for firms at the top of the markup distribution
+    \vitem The authors show how to estimate these markups, document them robustly, and show that we care about the entire distribution of markups, not just a summary statistic
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Estimating Markups}
+  \begin{itemize}
+  \item Existing approaches (BLP) rely on assumptions about consumer and firm behavior in order to get their results.
+    \begin{itemize}
+    \item BLP assumes firms compete via Nash-Bertrand and uses the FOC that comes out of that equation
+    \end{itemize}
+    \vitem \textbf{This paper:} estimates markup based on the wedge between an input's expenditure share (in revenue) and that input's output elasticity.
+    \vitem Need to estimate a production function in order to do this.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Approach}
+  \begin{itemize}
+  \item Document some stylized facts about markups for the past 60 years.
+    \vitem Show that these patterns are robust to different definitions of markups.
+    \vitem \textbf{Question:} are markups rising exclusively because of increasing fixed costs?
+    \vitem \textbf{Answer:} No; fixed costs have increased, but profit rates and markups have increased even more.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Production Function Approach to Markup Estimation}
+\setlength{\jot}{20pt}
+  \begin{align*}
+    Q_{it} &= Q_{it}(\overbrace{\Omega_it}^{\mathclap{\text{productivity}}},\underbrace{V_{it}}_{\mathclap{\text{variable inputs}}}, K_{it}) \tag{production technology}\\
+    \mathcal{L}(V_{it}, K_{it}, \lambda_{it}) &= P^V_{it}V_{it} + r_{it}K_{it} + F_{it} - \lambda_{it}(Q(\cdot) - \overline{Q}_{it})\\
+    \frac{\partial \mathcal{L}}{\partial V_{it}} &= P_{it}^V - \lambda_{it} \frac{\partial Q(\cdot)}{\partial V_{}it} = 0 \tag{FOC}\\    \intertext{rearrange and multiply by $\frac{V_{it}}{Q_{it}}$ to get elasticity:}
+    \theta_{it}^v &\equiv \frac{\partial Q(\cdot)}{\partial V_{it}}\frac{V_{it}}{Q_{it}}\\[-10pt]
+    &= \frac{1}{\lambda_{it}} \frac{P_{it}^V}{Q_{it}}
+  \end{align*}
+\end{frame}
+%
+\begin{frame}{Production Function Approach to Markup Estimation}
+  \begin{itemize}
+  \item Does \rd{not} depend on specifying conduct or a particular demand system.
+    \vitem In principle there are multiple FOCs that give an expression for markups
+    \vitem Need two ingredients from the data:
+    \begin{itemize}
+    \item Revenue share of variable input, $\dfrac{P_{it}^V V_{it}}{P_{it}Q_{it}}$
+      \vitem Output elasticity of the variable input, $\theta^v_{it}$
+    \end{itemize}
+  \end{itemize}
+  \end{frame}
+  %
+  \begin{frame}{Data}
+    \begin{itemize}
+    \item Compustat Data for 60 years
+      \vitem Construct user cost of capital as
+      \[
+r_t = (I_t - \Pi_t) + \Delta
+      \]
+      \vitem Use SG \&A as a measure of overhead
+      \begin{itemize}
+      \item Also consider a specification where overhead is a factor of production
+      \end{itemize}
+      \vitem Supplement Compustat data with Census data
+    \end{itemize}
+  \end{frame}
+  %
+  \begin{frame}{Evolution of Markups and Distribution of Markups}
+    \begin{columns}
+\begin{column}{0.5\textwidth}
+     \includegraphics[width=\textwidth, keepaspectratio=true]{fig1.png}
+\end{column}
+\begin{column}{0.5\textwidth}  %%<--- here
+    \begin{center}
+     \includegraphics[width=\textwidth, keepaspectratio=true]{fig3.png}
+     \end{center}
+\end{column}
+\end{columns}
+  \end{frame}
+  %
+  \begin{frame}{Markup Growth at the Firm Level}
+    There are two forces at work:
+    \begin{enumerate}
+    \item The markup (within term) increases
+      \item Reallocation of sales to high-markup firms
+    \end{enumerate}
+    \begin{figure}[htp]
+      \centering
+      \includegraphics[width=0.8\textwidth, keepaspectratio=true]{fig4.png}
+    \end{figure}
+  \end{frame}
+  %
+  \begin{frame}{What do we lose when we use aggregate data?}
+    \begin{columns}
+\begin{column}{0.5\textwidth}
+  \[\sum_i \frac{S_{it}}{P_{it}^V V_{it}} \ne \frac{\sum_i S_{it}}{\sum_i P^V_{it} V_{it}}\]
+  \begin{itemize}
+  \item The series based on aggregate data are all below the benchmark series
+    \vitem A substantial part of the increase occurs within industry
+    \vitem The dispersion and skewness of the distribution of markups have increased over time
+  \end{itemize}
+\end{column}
+\begin{column}{0.65\textwidth}  %%<--- here
+    \begin{center}
+     \includegraphics[width=\textwidth, keepaspectratio=true]{fig5.png}
+     \end{center}
+\end{column}
+\end{columns}
+  \end{frame}
+  %
+  \begin{frame}{Markups and Profits at the Firm Level}
+    \begin{columns}
+\begin{column}{0.5\textwidth}
+  \[\pi_{it} = 1 - \frac{\theta_{st}}{\mu_{it}} - \frac{r_t K_{it}}{S_{it}} - \frac{P_t^X X_{it}}{S_{it}}\]
+  \begin{itemize}
+  \item This profit measure includes the output elasticity of the production technology
+    \vitem The increase in average profits is almost exclusively driven by the increase in profits for high profit firms
+  \end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}  %%<--- here
+    \begin{center}
+     \includegraphics[width=\textwidth, keepaspectratio=true]{fig8.png}
+     \end{center}
+\end{column}
+\end{columns}
+  \end{frame}
+  %
+  \begin{frame}{Comparing Aggregate Profits and Markups}
+    \[
+\pi_{it} = \frac{P_{it} Q_{it} - C(Q_{it})}{P_{it} Q_{it}} = 1 - \frac{AC_{it}}{\mu_{it} MC_{it}} \tag{15}
+    \] 
+    \begin{itemize}
+    \item Assuming constant ratio of $MC$ to $AC$ and representative firm, implied profit is 38\%. How to reconcile with the data?
+    \end{itemize}
+    \begin{figure}[htp]
+      \centering
+      \includegraphics[width=0.7\textwidth, keepaspectratio=true]{fig15.png}
+    \end{figure}
+  \end{frame}
+  %
+  \begin{frame}{Conclusion}
+    \begin{itemize}
+    \item Since 1980, markups have risen from $21\% \to 61\%$, and profits from $1\% \to 8\%$
+      \vitem Almost all the change is due to high-markup firms.
+      \vitem The rise in markups is not simply offsetting increasing fixed costs (although fixed costs \emph{are} increasing).
+      \vitem This provides one possible explanation for the secular decline in the labor share in the US.
+    \end{itemize}
+  \end{frame}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
