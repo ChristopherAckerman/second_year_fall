@@ -1,0 +1,203 @@
+
+\documentclass{beamer}
+\input{../slides_preamble}
+\title{The Evolution of Market Power in the US Auto Industry}
+\author{Grieco, Murray and Yurukoglu}
+
+\begin{document}
+\maketitle
+\begin{frame}{Overview}
+  \begin{itemize}
+  \item BLP looks at demand for cars at a single point in time.
+    \vitem This is an extension, and has more detailed data (second choice product choices).
+    \vitem Also looks at consumer welfare, and how consumer surplus has changed over time.
+    \vitem Even though prices have gone up, consumers are better off and are capturing more total surplus, largely due to higher quality cars.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Estimation}
+  \begin{itemize}
+  \item Estimation via BLP; need instruments
+    \vitem \textbf{Instrument:} lagged real exchange rate in country of manufacture
+    \begin{itemize}
+    \vitem Captures input cost variation through local labor costs
+      \vitem Also captures variation through the nominal exchange rate
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Industry Overview}
+  \begin{itemize}
+  \item Looking at automobiles from 1980--2018.
+    \vitem HHI (measured at the parent company level) fell from $>2500$ to $\sim\! 1200$
+    \vitem SUVs became really popular, going from $\sim\! 0\%$ of the market to $\sim\! 50\%$ by 2018
+    \vitem Vehicles became larger and more powerful
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Model (Consumers)}
+  \begin{itemize}
+  \item Differentiated product demand and oligopoly model (BLP)
+    \[
+u_{ijt} = \beta_i \mathbf{x}_{jt} + \alpha_i p_{jt} + \xi_{jt} + \varepsilon_{ijt}
+    \]
+    \vitem $\mathbf{x}_j$ vehicle attributes
+    \vitem $p_j$ price
+    \vitem $\xi_{jt}$ unobserved, vehicle-specific term
+    \vitem $\varepsilon_{ijt}$ idiosyncratic consumer-vehicle specific term
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Model (Consumers)}
+  \begin{itemize}
+  \item Unable to separately identify annual average unobserved quality, $\tau_t$ and value of the outside option, $\gamma_t$
+    \vitem Add restriction
+    \[
+\forall j \in \mathcal{J}_t: E[\xi_{jt} - \xi_{jt - 1}] = E[(\tau_t -\tau_{t - 1}) + (\overline{\xi}_{jt} - \overline{\xi}_{jt - 1})] = 0
+    \]
+    \vitem Models within a generation don't change very much; identify $\gamma_t$ in two steps:
+    \begin{enumerate}
+    \vitem $\tau_t - \gamma_t$ is identified via standard discrete choice arguments
+      \vitem We can construct $\overline{\xi}_{jt}$ from identified objects, so the moment condition identifies $\tau_t$
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Model (Consumer Preferences)}
+  \begin{align*}
+    \alpha_i &= \overline{\alpha} + \sum_h \alpha_h D_{ih}\\
+    \beta_{ik} &= \overline{\beta}_k + \sum_h \beta_{kh} D_{ih} + \sigma_k \nu_{ik} 
+  \end{align*}
+  \begin{itemize}
+  \item $D_{ih}$ taken from CPS
+    \vitem $\nu_{ik}$ assumed independent draws from standard normal
+  \end{itemize}
+  \vfill
+  \[
+s_{jt} = \int_i \frac{\exp (\beta_i x_j + \alpha_i p_j + \xi_j)}{\exp (\gamma_t) + \sum_{l \in \mathcal{J}_t} \exp (\beta_i x_l + \alpha_i p_l + \xi_l)} dF(i)
+  \]
+  \begin{itemize}
+  \item Compute second choice vehicles by integrating consumers' choice probabilities with the first choice vehicle removed
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Model (Firms)}
+  \begin{itemize}
+  \item Firms $m$ play a static, full-information, simultaneous-move pricing game each year
+    \vitem Choose prices for all vehicles to maximize firm profit; observed profits form a Nash Equilibrium
+    \[
+s_{jt} + \sum_{k \in \mathcal{J}_t^m }(p_{jt} - c_{jt}) \frac{\partial s_{jt}}{\partial p_{kt}} = 0 \tag{FOC}
+    \]
+    \vitem Solve for marginal costs; use estimated MCs to compute price-cost ratios and for counterfactual analysis
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Model (Firms)---Limitations}
+  \begin{itemize}
+  \item Nash-Bertrand assumption rules out cartels and other changes in conduct
+    \vitem If firms become more/less collusive then the implied MCs will be wrong
+    \vitem Do not try to measure changes in conduct (other IO papers do this)
+    \vitem \emph{Do} look at alternative conduct assumptions for robustness and counterfactuals
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Estimation}
+  \begin{itemize}
+  \item Estimate via GMM; three distinct steps
+    \begin{enumerate}
+      \vitem Jointly estimate consumer heterogeneity and mean consumer valuations; use micro-moments from purchase data and second-choice data
+      \vitem Estimate $\overline{\alpha}$ and $\overline{\beta}$, and year FE by regressing estimated consumer mean valuations on product characteristics, prices, make dummies and year dummies
+  \vitem Use the empirical analogue of the continuing product condition to estimate $\tau_t$ and $\gamma_t$
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Parameter Estimates}
+  \begin{itemize}
+  \item Higher income people are less price sensitive
+    \vitem Older households less price sensitive
+    \vitem Larger households want larger vehicles
+    \vitem Rural households have a stronger preference for trucks
+    \vitem Consumers hold on to cars for longer ($3.9 \to 5.9$ years)
+    \begin{itemize}
+    \item Not a parameter estimate, but the authors interpret this as an improvement in unobserved quality
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Markups}
+  \begin{figure}[htp]
+    \centering
+    \includegraphics[width=\textwidth, keepaspectratio=true]{fig5.png}
+  \end{figure}
+\end{frame}
+%
+\begin{frame}{Explaining the Evolution of Markups}
+  \begin{itemize}
+  \item Estimate markups are similar if the authors assume single-product firms or industry wide collusion
+    \vitem Decreases in concentration are not driving the decline in markups
+    \vitem \textbf{Economic intuition:} prices are increasing but shares aren't decreasing because car quality is increasing
+    \vitem \rd{Robustness check:} Would need a cartel of the six biggest firms to overturn this result
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Production Approach---Differences}
+  \begin{figure}[htp]
+    \centering
+    \includegraphics[width=\textwidth, keepaspectratio=true]{fig9.png}
+  \end{figure}
+  \begin{itemize}
+  \item Demand/conduct approach could be wrong because the exclusion restriction is violated for the IV, or because Nash assumption is wrong
+    \vitem Production estimates could be wrong because of data problems
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Welfare}
+%   \[
+% \widetilde{CS}_t = \frac{1}{T} \sum^T_{\nu = 0} CS_t (\gamma_\nu)
+%   \] 
+    \begin{figure}[htp]
+      \centering
+    \includegraphics[width=0.9\textwidth, keepaspectratio=true]{fig10.png}
+    \end{figure}
+  \begin{itemize}
+  \item Surplus rises from $\$5,000\to \$25,000$
+    \vitem Efficient market; very small DWL
+    \vitem Most of the increase in competition comes from the entry of second- and third firms; auto industry features $>4$ firms at all times so it's reasonable to think it is competitive
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Why does CS rise?}
+  \begin{itemize}
+  \item[\textbf{1}] Increased Competitive Pressure from foreign brands
+    \begin{itemize}
+    \item The only way to overturn this mechanism is to assume that all car firms operate as a single cartel
+    \end{itemize}
+  \vitem[\textbf{2}] Product Proliferation
+    \begin{itemize}
+    \item Consumers like variety
+      \vitem Additional products crowds the characteristics space and increases competitive pressure
+      \vitem Results indicate that this isn't a significant driver of the increase in consumer surplus
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Why does CS rise?}
+  \begin{itemize}
+  \item[\textbf{3}] Changing Product Attributes
+    \begin{itemize}
+    \item Large effect due to improvements in unobservable vehicle quality
+      \vitem A large portion of increased surplus is due to new features (rear-view camera, bluetooth, better reliability)
+    \end{itemize}
+  \vitem[\textbf{4}] Decreasing Costs
+    \begin{itemize}
+    \item Marginal costs for a fixed set of characteristics declines over time
+      \vitem Removing these cost reductions eliminates about half of CS increases
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

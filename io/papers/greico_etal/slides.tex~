@@ -1,0 +1,21 @@
+
+\documentclass{beamer}
+\input{../slides_preamble}
+\title{The Evolution of Market Power in the US Auto Industry}
+\author{Grieco, Murray and Yurukoglu}
+
+\begin{document}
+\maketitle
+\begin{frame}{Overview}
+  \begin{itemize}
+  \item BLP looks at demand for cars at a single point in time.
+    \vitem This is an extension, and has more detailed data (second choice product choices).
+    \vitem Also looks at consumer welfare, and how consumer surplus has changed over time.
+    \vitem Even though prices have gone up, consumers are better off and are capturing more total surplus, largely due to higher quality cars.
+  \end{itemize}
+\end{frame}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
