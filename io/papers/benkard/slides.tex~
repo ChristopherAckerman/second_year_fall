@@ -1,0 +1,12 @@
+\documentclass{beamer}
+\input{../slides_preamble}
+\title{Learning and Forgetting: The Dynamics of Aircraft Production}
+\author{C. Lanier Benkard}
+
+\begin{document}
+\maketitle
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
