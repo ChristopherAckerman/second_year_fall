@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.11.27)  29 NOV 2021 10:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.11.27)  29 NOV 2021 11:00
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1613,7 +1613,7 @@ Overfull \vbox (2.21255pt too high) detected at line 27
 <table1.png, id=65, 998.73125pt x 585.18625pt>
 File: table1.png Graphic file (type png)
 <use table1.png>
-Package pdftex.def Info: table1.png  used on input line 90.
+Package pdftex.def Info: table1.png  used on input line 89.
 (pdftex.def)             Requested size: 307.28987pt x 180.04861pt.
  [8
 
@@ -1621,10 +1621,10 @@ Package pdftex.def Info: table1.png  used on input line 90.
 <fig3.jpg, id=71, 509.905pt x 383.4325pt>
 File: fig3.jpg Graphic file (type jpg)
 <use fig3.jpg>
-Package pdftex.def Info: fig3.jpg  used on input line 97.
+Package pdftex.def Info: fig3.jpg  used on input line 96.
 (pdftex.def)             Requested size: 307.28987pt x 231.08514pt.
 
-Overfull \vbox (1.81201pt too high) detected at line 97
+Overfull \vbox (1.81201pt too high) detected at line 96
  []
 
 [9
@@ -1633,7 +1633,7 @@ Overfull \vbox (1.81201pt too high) detected at line 97
 <table2.png, id=77, 1001.7425pt x 456.70625pt>
 File: table2.png Graphic file (type png)
 <use table2.png>
-Package pdftex.def Info: table2.png  used on input line 109.
+Package pdftex.def Info: table2.png  used on input line 108.
 (pdftex.def)             Requested size: 307.28987pt x 140.09312pt.
  [10
 
@@ -1641,31 +1641,31 @@ Package pdftex.def Info: table2.png  used on input line 109.
 <table3.png, id=83, 1024.82875pt x 392.46625pt>
 File: table3.png Graphic file (type png)
 <use table3.png>
-Package pdftex.def Info: table3.png  used on input line 123.
+Package pdftex.def Info: table3.png  used on input line 122.
 (pdftex.def)             Requested size: 307.28987pt x 117.6749pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 123.
+(Font)              <10> on input line 122.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 123.
+(Font)              <7> on input line 122.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 123.
+(Font)              <5> on input line 122.
  [11
 
  <./table3.png>]
 <fig4.jpg, id=89, 509.905pt x 385.44pt>
 File: fig4.jpg Graphic file (type jpg)
 <use fig4.jpg>
-Package pdftex.def Info: fig4.jpg  used on input line 130.
+Package pdftex.def Info: fig4.jpg  used on input line 129.
 (pdftex.def)             Requested size: 307.28987pt x 232.29501pt.
 
-Overfull \vbox (3.02188pt too high) detected at line 130
+Overfull \vbox (3.02188pt too high) detected at line 129
  []
 
 [12
 
  <./fig4.jpg>]
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 146.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 145.
  [13
 
 ] [14
@@ -1709,7 +1709,7 @@ ts/type1/public/lm/lmss12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmss
 8.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/share/tex
 mf-dist/fonts/type1/public/lm/lmsso10.pfb></usr/share/texmf-dist/fonts/type1/pu
 blic/lm/lmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on slides.pdf (15 pages, 434350 bytes).
+Output written on slides.pdf (15 pages, 434182 bytes).
 PDF statistics:
  164 PDF objects out of 1000 (max. 8388607)
  120 compressed objects within 2 object streams
