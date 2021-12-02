@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from sklearn.neighbors import KernelDensity
+rng = np.random.default_rng(seed=42)
 
 
 def load_bid_data(filename="PS3Data.csv"):
@@ -15,7 +16,7 @@ def load_bid_data(filename="PS3Data.csv"):
     return df
 
 
-def graph_bidder_data(bid_data=bid_data, filename='bidder_histogram.pdf', n_bins=50):
+def graph_bidder_data(bid_data, filename='bidder_histogram.pdf', n_bins=50):
     """
     Graph a histogram of bids by each bidder;
     Takes bid data and number of bids as arguments
@@ -34,7 +35,7 @@ def graph_bidder_data(bid_data=bid_data, filename='bidder_histogram.pdf', n_bins
     plt.close('all')
 
     
-def graph_bids(bid_data=bid_data, filename='bid_density.pdf', bandwidth=0.5):
+def graph_bids(bid_data, filename='bid_density.pdf', bandwidth=0.5):
     """
     Plot actual bid data for both bidders
     Along with an estimated density of bids
@@ -42,7 +43,7 @@ def graph_bids(bid_data=bid_data, filename='bid_density.pdf', bandwidth=0.5):
     """
     bids = bid_data.drop("Auction #", axis=1).values.flatten().reshape(-1, 1)
     fig, ax = plt.subplots()
-    X = rng.random_sample((100,1))
+    X = np.random.random_sample((100,1))
     kde = sm.nonparametric.KDEUnivariate(bids)
     kde.fit()
     ax.plot(kde.support, kde.density, label='fitted density')
@@ -112,7 +113,7 @@ def estimate_values_density(B, kg, hg, rhog, kf, hf, grid):
 
 def graph_estimated_density(
         density_support,
-        estimated_density=estimated_density,
+        estimated_density,
         filename='estimated_density.pdf'
 ):
     fig, ax = plt.subplots()
@@ -133,7 +134,7 @@ if __name__ == '__main__':
     bid_data = load_bid_data(filename="PS3Data.csv")
     graph_bidder_data(bid_data=bid_data, filename='bidder_histogram.pdf', n_bins=50)
     graph_bids(bid_data=bid_data, filename='bid_density.pdf', bandwidth=0.5)
-    density_support = np.linspace(2, 10, 500)
+    density_support = np.linspace(5, 10, 500)
     estimated_density = estimate_values_density(
                                     B = bid_data[['Bidder 1', 'Bidder 2']].to_numpy()/2,
                                     kg = generate_uniform_kernel(),

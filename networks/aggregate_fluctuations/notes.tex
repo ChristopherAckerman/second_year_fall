@@ -1,0 +1,87 @@
+\input{../article_preamble.tex}
+\title{Notes for \emph{The Network Origins of Aggregate Fluctuations}}
+\author{Chris Ackerman}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+\section{Overview}
+\begin{itemize}
+\item Paper was written shortly after the 2008 Financial Crisis
+\item \textbf{Leading question:} How does the organization of the input-output network in an economy affect economic volatility?
+\item \textbf{Leading example: One sector}
+  \begin{itemize}
+  \item If there's one sector and one firm, then any shock to that firm shuts down the entire economy.
+    \item But if we send $n_{\text{firms}} \to \infty$ then shocks to individual firms become unimportant, and the economy is resilient to uncorrelated shocks.
+    \end{itemize}
+  \item \textbf{Leading Counterexample: Automakers during 2008}
+    \begin{itemize}
+    \item Some suppliers make small but important parts for all the carmakers
+    \item If one of these small companies collapses, there's a chance that none of the carmakers will be able to continue making cars
+      \item Ford asked congress to support Chrysler and GM so that their mutual suppliers wouldn't experience any disruptions
+    \end{itemize}
+    \item \textbf{Research Question: } Can we write down a network model of these interactions to generalize this insight? And can we fit this model to actual input/output data from the US?
+      \item \rd{NB we can put figures 1--3 on slides to show the 2 leading examples of symmetric networks, and then the actual 1997 network to show that it exhibits meaningful asymmetry.}
+\end{itemize}
+
+\section{Approach}
+\begin{itemize}
+\item Consider a sequence of economies $\{\mathcal{E}_n\}_{n \in \mathbb{N}}$ corresponding to different levels of disaggregation
+\item Each economy $\mathcal{E}_n$ has $n$ sectors whose input requirements are captured by an $n \times n$ matrix $W_n$
+  \item entry $(i, j)$ captures the share of sector $j$'s product in sector $i$'s production technology
+  \item $j$th column sum, the \emph{degree} of sector $j$, is the share of $j$'s output in the input of the entire economy
+  \item Given a sequence of economies $\{\mathcal{E}_n\}_{n \in \mathbb{N}}$, investigate whether \emph{aggregate volatility} (st. dev. of log otuput) vanishes as $n \to \infty$.
+    \begin{itemize}
+    \item \textbf{Preview of results: SOMETIMES}
+    \end{itemize}
+  \item Main focus: when does LLN hold and the network structure has an important effect on aggregate fluctuations
+    \begin{itemize}
+    \item Aggregate output might concentrate around its mean at a rate slower than $\sqrt{n}$; sectoral shocks may have a significant role in creating aggregate shocks, even if a disaggregated economy
+    \item Two causes of slow rates of aggregate volatility decay:
+      \begin{enumerate}
+      \item First-order interconnections: shocks to a sector that is a supplier to lots of other sectors; direct propagation
+        \item Higher-order interconnections: low productivity in one sector might reduce productivity in a sequence of interconnected sectors
+      \end{enumerate}
+    \end{itemize}
+\end{itemize}
+
+\section{Results}
+\begin{itemize}
+\item[Theorem 2:] Provides a lower bound on asymmetry across sectors captured by variation in sectoral degrees. Higher variation in the degree of different sectors implies lower rates of decay for aggregate volatility.
+  \item[Theorem 3:] Tighter lower bound on second-order interconnectivity between different sectors. Two economics with identical empirical degree distributions (first-order connections) may have significantly different levels of aggregate volatility because of interactions with downstream sectors.
+    \item[Theorem 4:] Sectoral shocks average out at rate $\sqrt{n}$ for \emph{balanced} networks. The nature of aggregate fluctuations resulting from sectoral shocks is not related to the sparseness of the input-output matrix, but the extent of asymmetry between sectors.
+    \item Empirical exercise (section 4):
+      \begin{itemize}
+      \item Empirical distribution of both first- and second-order degrees have Pareto tails, with second-order tail having a shape parameter of $\zeta = 1.18$
+      \item If this degree distribution also holds for large $n$, aggregate volatility in the US economy decays at rate slower than $n^{0.15}$
+      \item US input-output network more similar to a star network than complete network
+        \item In practice we might see sizable aggregate fluctuations from idiosyncratic shocks to different sectors
+      \end{itemize}
+\end{itemize}
+
+\section{Model}
+\begin{itemize}
+\item Representative household with one unit of inelastic labor; Cobb-Douglas preferences over $n$ distinct goods:
+  \[
+u(c_1, c_2,\ldots, c_n) = A \prod^n_{i = 1} (c_i)^{1/n}
+  \]
+\item Each good is produced by a competitive sector and can be either consumed or used by other sectors as an input for production. Each sector uses C-D production with CRS; output of sector $i$ is
+  \[
+x_{i}=z_{i}^{\alpha} \ell_{i}^{\alpha} \prod_{j=1}^{n} x_{i j}^{(1-\alpha) w_{i j}}
+  \]
+  $z_i$ are productivity shocks across sectors, $\varepsilon_i \equiv \log(z_i) \sim F_i$. $w_{ij} \ge 0$ is the share of good $j$ in the intermediate inputs of firms in sector $i$. This definition is nice because $w_{ij}$ corresponds to the entries of input-output tables; will use this in section 4 for the calibration bit.
+\item Can summarize the structure of intersectoral trade with the input-output matrix $W$, which has entries $w_{ij}$.
+\item Economy is completely specified by the tuple
+  \[
+\mathcal{E} = (\mathcal{I}, W, \{F_i\}_{i \in \mathcal{I}}), 
+\]
+where $\mathcal{I}$ is the number of sectors.
+\item Can equivalently represent the economy as a weighted directed graph on $n$ vertices
+\end{itemize}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

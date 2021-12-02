@@ -1,0 +1,15 @@
+\documentclass[dvipsnames]{article}
+\input{../article_preamble.tex}
+\title{Notes for \emph{The Network Origins of Aggregate Fluctuations}}
+\author{Chris Ackerman}
+\date{\today}
+
+
+\begin{document}
+\maketitle
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

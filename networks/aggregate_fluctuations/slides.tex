@@ -1,0 +1,316 @@
+\documentclass[dvipsnames]{beamer}
+\input{../slides_preamble}
+\newcommand{\var}{\operatorname{Var}}
+\title{The Network Origins of Aggregate Fluctuations\\
+  Acemoglu, Carvalho, Ozdaglar \& Tahbaz-Salehi\\
+  \emph{Econometrica 2012}
+}
+\author{Chris Ackerman and Antonio Martner}
+
+\begin{document}
+\maketitle
+% \begin{frame}{Motivation}
+% \begin{itemize}
+% \item Paper was written shortly after the 2008 Financial Crisis
+% \item \textbf{Leading question:} How does the organization of the input-output network in an economy affect economic volatility?
+% \item \textbf{Leading example: One sector}
+%   \begin{itemize}
+%   \item If there's one sector and one firm, then any shock to that firm shuts down the entire economy.
+%     \item But if we send $n_{\text{firms}} \to \infty$ then shocks to individual firms become unimportant, and the economy is resilient to uncorrelated shocks.
+%     \end{itemize}
+%   \item \textbf{Leading Counterexample: Automakers during 2008}
+%     \begin{itemize}
+%     \item Some suppliers make small but important parts for all the carmakers
+%     \item If one of these small companies collapses, there's a chance that none of the carmakers will be able to continue making cars
+%       \item Ford asked congress to support Chrysler and GM so that their mutual suppliers wouldn't experience any disruptions
+%     \end{itemize}
+%     \item \textbf{Research Question: } Can we write down a network model of these interactions to generalize this insight? And can we fit this model to actual input/output data from the US?
+%       \item \rd{NB we can put figures 1--3 on slides to show the 2 leading examples of symmetric networks, and then the actual 1997 network to show that it exhibits meaningful asymmetry.}
+% \end{itemize}
+% \end{frame}
+\begin{frame}{Model}
+  
+\section{Model}
+
+{\bf Household preferences} 
+\begin{align}
+  u(c_1,c_2,\ldots ,c_n)=A \prod \limits_{i=1}^n c_i^{\frac{1}{n}}
+\end{align}
+
+{\bf Sector production functions:} each good produced by competitive sector; can be either consumed or used by other sectors as an input
+\begin{align}
+  x_i=z_i^\alpha l_i^\alpha \prod \limits_{j=1}^n x_{ij}^{(1-\alpha)w_ij}
+\end{align}
+
+\begin{itemize}
+  \item $x_{ij}$: Amount of commodity $j$ used in the production of good $i$
+  \vitem $w_{ij}$: Share of good $j$ in total input use of firms in sector $i$
+    \begin{itemize}
+    \item 
+      \gr{Correspond to the entries in input-output tables}
+    \end{itemize}
+  \vitem $z_i$: Idiosyncratic productivity shock to sector $i$. Independent across
+  sectors and  $\varepsilon \equiv \log(z_i) \sim F_i$.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Model}
+  \begin{assumption}[Assumption 1]
+    Input shares of all sectors add up to 1: $\sum \limits_{j=1}^n w_{ij}=1 \ \ \forall \ i$. 
+  \end{assumption}
+  \begin{itemize}
+\item Can summarize the structure of intersectoral trade with the input-output matrix $W$, which has entries $w_{ij}$.
+\vitem Economy is completely specified by the tuple
+  \[
+\mathcal{E} = (\mathcal{I}, W, \{F_i\}_{i \in \mathcal{I}}),\quad \mathcal{I} \text{ is the number of sectors} 
+\]
+% where $\mathcal{I}$ is the number of sectors.
+\vitem Can equivalently represent the economy as a weighted directed graph on $n$ vertices, 
+  \begin{itemize}
+  \item each vertex corresponds to a sector
+    \vitem A directed edge $(j, i)$ with weight $w_{ij}>0$ is present from
+vertex $j$ to vertex $i$ if sector $j$ is an input supplier to sector $i$.
+  \end{itemize}
+ 
+\end{itemize}
+% W with entries $w_{ij}$. Thus, the economy is completely specified by the tuple
+% $\varepsilon = (I, W, F_i)$, where $I$  denotes the set of sectors.\\
+
+% Intersectoral network of the economy: weighted graph on $n$ vertices, where
+% each vertex corresponds to a sector
+% in the economy, and a directed edge $(j, i)$ with weight $w_{ij}>0$ is present from
+% vertex $j$ to vertex $i$ if sector $j$ is an input supplier to sector $i$.\\
+\end{frame}
+%
+\begin{frame}{Model}
+% Weighted outdegree:  Of sector i as the
+% share of sector i output in the input supply of the entire economy normalized
+% by constant $ 1-\alpha $ : $d_i \sum \limits_{j=1}^n w_{ij}$.\\
+  \begin{definition}[Weighted Outdegree of sector $i$]
+    Share of sector $i$'s output in the input supply of the entire economy, normalized by $1 - \alpha$,
+    \[
+d_i \equiv \sum^n_{j = 1} w_{ji}.
+    \]
+  \end{definition}
+  \begin{itemize}
+  \vitem  When all nonzero edge weights are identical, the outdegree of vertex $i$ is proportional to the number of sectors it is a supplier for.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Competitive Equilibrium}
+
+The competitive equilibrium of the economy can be represented by value added:
+\begin{align}
+  y = \log (GDP) = \nu' \varepsilon
+\end{align}
+
+\begin{definition}[Influence Vector]
+  \[
+    \nu=\frac{\alpha}{n}[I-(1-\alpha)W']^{-1}
+  \]
+\end{definition}
+\begin{itemize}
+\item Aggregate output is a linear combination of log sectoral shocks with coefficients determined by the influence vector.
+\vitem Aggregate output depends on the intersectoral network of the economy
+through the Leontief inverse $[I - (1 - \alpha) W^\prime]^{-1}$.
+\vitem Influence vector also  captures
+how sectoral productivity shocks propagate downstream to other sectors
+through the input–output matrix.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Model---Influence Vector}
+  \begin{itemize}
+  \item The influence vector can also be interpreted as a centrality measure.
+  \vitem Central sectors in the network representation of the economy play a more important role in determining aggregate output.
+  \vitem 
+$\nu$ is also the sales vector of the economy in the sense that the $i$th element of the influence vector is equal to the equilibrium
+share of sales of sector $i$:
+\begin{align}
+  \nu_i=\frac{p_ix_i}{\sum \limits_{j=1}^np_jx_j}
+\end{align}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Adding Network Structure}
+  \begin{itemize}
+  \item Focus on a sequence of economics where the number of sectors increases
+    \vitem Characterize how the \gr{structure} of the intersectoral network affects aggregate fluctuations
+    \vitem Sequence of economies $\{\mathcal{E}_n\}_{n \in \mathbb{N}}$; economy $n$ is
+    \[
+\mathcal{E} = (\mathcal{I}_n, W_n, \{F_{in}\}_{i \in \mathcal{I}_n})
+    \]
+    \vitem Since the total supply of labor is normalized to 1, increasing $n$ (number of sectors) means disaggregating the structure of the economy
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Adding Network Structure---Notation and Assumptions}
+  \begin{itemize}
+  \item $\{y_n\}_{n \in \mathbb{N}}$ and $\{\nu_n\}_{n \in \mathbb{N}}$ are aggregate outputs and influence vectors
+    \vitem $w_{ij}^n$ and $d_i^n$ are elements of the intersectoral matrix $W_n$ and the degree of sector $i$
+    \vitem $\{\varepsilon_n\}_{n \in \mathbb{N}}$ is the sequence of vectors of (log) sectoral shocks
+  \end{itemize}
+  \begin{assumption}[Assumption 2]
+    Given a sequence of economies $\mathcal{E}_{n \in \mathbb{N}}$, for any sector $i \in \mathcal{I}_n$ and all $n \in \mathbb{N}$,
+    \begin{enumerate}
+    \item[(a)] $\mathbb{E} \varepsilon_{in} = 0$
+      \item[(b)] $\var (\varepsilon_{in}) = \sigma^2_{in} \in (\underline{\sigma}^2, \overline{\sigma}^2)$, where $0 < \underline{\sigma} < \overline{\sigma}$ are independent of $n$.
+    \end{enumerate}
+  \end{assumption}
+\end{frame}
+%
+\begin{frame}{Aggregate Volatility}
+  \begin{itemize}
+  \item Assumption 2(a) and independent sectoral shocks imply that we can write \gr{aggregate volatility} as
+    \[
+      (\var y_n)^{1/2} = \sqrt{\sum^n_{i  = 1} \sigma^2_{in} \nu^2_{in}}.
+    \]
+    \vitem For any sequence of economies satisfying Assumption 2(b),
+    \[
+(\var y_n)^{1/2} = \Theta (\| \nu_n \|_2).
+    \]
+    \vitem Aggregate volatility scales with the Euclidian norm of the influence vector as the economy becomes disaggregated.
+    \vitem The rate of decay of aggregate volatility may not be equal to $\sqrt{n}$ (the standard prediction from the diversification argument).
+    \vitem If $\|\nu\|_2$ is bounded away from zero for all $n$, then aggregate volatility does \rd{not} disappear as $n \to \infty$.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Asymptotic Distributions}
+  \begin{theorem}[Theorem 1]
+    Consider a sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$ and assume that $\mathbb{E} \varepsilon_{i n}^{2}=\sigma^{2}$ for all $i \in \mathcal{I}_{n}$ and all $n \in \mathbb{N}$
+    \begin{enumerate}
+    \item[(a)]
+ If $\left\{\varepsilon_{\text {in }}\right\}$ are normally distributed for all $i$ and all $n$, then $\frac{1}{\left\|v_{n}\right\|_{2}} y_{n} \stackrel{d}{\longrightarrow}$ $\mathcal{N}\left(0, \sigma^{2}\right)$
+\item[(b)] Suppose that there exist constant $a>0$ and random variable $\bar{\varepsilon}$ with bounded variance and cumulative distribution function $\bar{F}$, such that $F_{\text {in }}(x)<$ $\bar{F}(x)$ for all $x<-a$, and $F_{\text {in }}(x)>\bar{F}(x)$ for all $x>a .$ Also suppose that $\frac{\left\|v_{n}\right\|_{\infty}}{\left\|v_{n}\right\|_{2}} \longrightarrow 0 .$ Then $\frac{1}{\left\|v_{n}\right\|_{2}} y_{n} \stackrel{d}{\longrightarrow} \mathcal{N}\left(0, \sigma^{2}\right)$
+\item[(c)] Suppose that $\left\{\varepsilon_{\text {in }}\right\}$ are identically, but not normally distributed for all $i \in \mathcal{I}_{n}$ and all $n .$ If $\frac{\left\|v_{n}\right\|_{\infty}}{\left\|v_{n}\right\|_{2}}>0$, then the asymptotic distribution of $\frac{1}{\left\|v_{n}\right\|_{2}} y_{n}$, when it exists, is nonnormal and has finite variance $\sigma^{2}$.
+    \end{enumerate}
+  \end{theorem}
+\end{frame}
+%
+\begin{frame}{First-Order Interconnections}
+  \begin{itemize}
+  \item Characterize the rate of decay of aggregate volatility in terms of the \gr{structural properties} of the intersectoral network.
+    \vitem First result: The extent of asymmetry between sectors shapes the relationship between sectoral shocks and aggregate volatility.
+  \end{itemize}
+  \begin{definition}[Coefficient of Variation]
+     Given an economy $\mathcal{E}_{n}$ with sectoral degrees $\left\{d_{1}^{n}, d_{2}^{n}, \ldots, d_{n}^{n}\right\}$, the coefficient of variation is
+$$
+\mathrm{CV}_{n} \equiv \frac{1}{\bar{d}_{n}}\left[\frac{1}{n-1} \sum_{i=1}^{n}\left(d_{i}^{n}-\bar{d}_{n}\right)^{2}\right]^{1 / 2}
+$$
+where $\bar{d}_{n}=\left(\sum_{i=1}^{n} d_{i}^{n}\right) / n$ is the average degree.
+  \end{definition}
+\end{frame}
+%
+\begin{frame}{First-Order Interconnections}
+  \begin{theorem}[Theorem 2]
+    Given a sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$, aggregate volatility satisfies
+    \[\quad\left(\operatorname{var} y_{n}\right)^{1 / 2}=\Omega\left(\frac{1}{n} \sqrt{\sum_{i=1}^{n}\left(d_{i}^{n}\right)^{2}}\right)\]
+    and
+    \[\quad\left(\operatorname{var} y_{n}\right)^{1 / 2}=\Omega\left(\frac{1+\mathrm{CV}_{n}}{\sqrt{n}}\right).
+    \]
+  \end{theorem}
+  \begin{itemize}
+  \item High variability in degree sequence of intersectoral network $\implies$ high variability in effect of shocks on aggregate output.
+    \vitem High CV $\implies$  few sectors are responsible for most inputs.
+    \vitem Low productivity $\implies$ low productivity in downstream sectors.
+    \vitem Aggregate volatility decays slower than $\sqrt{n}$.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Interpreting Theorem 2}
+  \begin{definition}[Power Law Degree Sequence]
+     A sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$ has a power law degree sequence if there exist a constant $\beta>1$, a slowly varying function $L(\cdot)$ satisfying $\lim _{t \rightarrow \infty} L(t) t^{\delta}=\infty$ and $\lim _{t \rightarrow \infty} L(t) t^{-\delta}=0$ for all $\delta>0$, and a sequence of positive numbers $c_{n}=\Theta(1)$ such that, for all $n \in \mathbb{N}$ and all $k<d_{\max }^{n}=\Theta\left(n^{1 / \beta}\right)$, we have
+$$
+P_{n}(k)=c_{n} k^{-\beta} L(k)
+$$
+where $P_{n}(k) \equiv \frac{1}{n}\left|\left\{i \in \mathcal{I}_{n}: d_{i}^{n}>k\right\}\right|$ is the empirical counter-cumulative distribution function and $d_{\max }^{n}$ is the maximum degree of $\mathcal{E}_{n}$.
+  \end{definition}
+  \begin{itemize}
+  \item Look at the special case where the intersectoral networks have power law degree sequences.
+    \vitem The first part of Theorem 2 says that aggregate volatility is higher in economies whose degree sequences have ``heavier tails''.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Interpreting Theorem 2}
+  \begin{corollary}[Corollary 1]
+     Consider a sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$ with a power law degree sequence and the corresponding shape parameter $\beta \in(1,2) .$ Then, aggregate volatility satisfies
+$$
+\left(\operatorname{var} y_{n}\right)^{1 / 2}=\Omega\left(n^{-(\beta-1) / \beta-\delta}\right)
+$$
+where $\delta>0$ is arbitrary.
+  \end{corollary}
+  \begin{itemize}
+  \item If the degree sequence of the intersectoral network exhibits heavy tails, aggregate volatility decreases at a much slower rate than predicted by the diversification argument.
+    \vitem Note that so far the authors have only provided a \rd{lower bound} on the rate at which aggregate volatility vanishes.
+    \vitem Higher-order structural properties of the intersectoral network can still prevent output volatility from decaying at rate $\sqrt{n}$.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Second-Order Interconnections and Cascades}
+  \begin{itemize}
+  \item First-order interconnections provide little information about how shocks to a sector affect the downstream customers of downstream customers of the affected sector, etc.
+    \vitem The next theorem provides a lower bound on the decay rate of aggregate volatility in terms of \gr{second-order} interconnections in the intersectoral network.
+    \begin{definition}[Definition 3---$2$nd-Order Interconnectivity Coefficient]
+       The second-order interconnectivity coefficient of economy $\mathcal{E}_{n}$ is
+$$
+\tau_{2}\left(W_{n}\right) \equiv \sum_{i=1}^{n} \sum_{j \neq i} \sum_{k \neq i, j} w_{j i}^{n} w_{k i}^{n} d_{j}^{n} d_{k}^{n}.
+$$
+    \end{definition}
+    \item Measures extent to which high degree sectors are connected to each other via common suppliers
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Second-Order Interactions and Cascades}
+  \begin{theorem}[Theorem 3]
+    Given a sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$, aggregate volatility satisfies
+ \[\quad\left(\operatorname{var} y_{n}\right)^{1 / 2}=\Omega\left(\frac{1}{\sqrt{n}}+\frac{\mathrm{CV}_{n}}{\sqrt{n}}+\frac{\sqrt{\tau_{2}\left(W_{n}\right)}}{n}\right)\]
+  \end{theorem}
+  \begin{itemize}
+  \item Shows how second-order interactions, captured by $\tau_2$, affect aggregate volatility.
+    \vitem Even if the empirical degree distributions of two sequences of economies are identical for all $n$, their aggregate volatilities may exhibit considerably different behaviors.
+    \vitem This is a refinement of Theorem 2; it captures the notion that there is a clustering of significant sectors because they have common suppliers.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Interpreting Theorem 3}
+  \begin{corollary}[Corollary 2]
+     Suppose that $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$ is a sequence of economies whose second-order degree sequences have power law tails with shape parameter $\zeta \in$ $(1,2)($ cf. Definition 2). Then, aggregate volatility satisfies
+$$
+\left(\operatorname{var} y_{n}\right)^{1 / 2}=\Omega\left(n^{-(\zeta-1) / \zeta-\delta}\right)
+$$
+for any $\delta>0$.
+  \end{corollary}
+  \begin{itemize}
+  \item If the distributions of second-order degrees have heavy tails, aggregate volatility decreases much more slowly than predicted by diversification.
+    \vitem Second-order effects may dominate first-order effects.
+    \vitem If a sequence of economies has power law tails for both first- and second-order degrees, with exponents $\beta$ and $\zeta$, then the tighter bound for the decay rate of aggregate volatility is determined by $\min \{\beta, \zeta\}$.
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Balanced Structures}
+  \begin{itemize}
+  \item With limited variations in the degrees of different sectors, aggregate volatility decays at rate $\sqrt{n}$.
+    \begin{definition}[Definition 4---Balanced Sequence of Economics]
+       A sequence of economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$ is balanced if $\max _{i \in \mathcal{I}_{n}} d_{i}^{n}=$ $\Theta(1)$.
+    \end{definition}
+    \vitem When the intersectoral network is balanced and the role of intermediate inputs is not too large, volatility decays at rate $\sqrt{n}$.
+    \vitem Other structural properties of the network cannot contribute to aggregate volatility.
+    \begin{theorem}[Theorem 4]
+       Consider a sequence of balanced economies $\left\{\mathcal{E}_{n}\right\}_{n \in \mathbb{N}}$. Then there exists $\bar{\alpha} \in(0,1)$ such that, for $\alpha \geq \bar{\alpha}$, (var $\left.y_{n}\right)^{1 / 2}=\Theta(1 / \sqrt{n})$.
+    \end{theorem}
+  \end{itemize}
+\end{frame}
+%
+\begin{frame}{Interpreting Theorem 4}
+  \begin{itemize}
+  \item Theorem 4 is both an aggregation and an irrelevance result for balanced economies.
+    \vitem As an aggregation result, it suggests observational equivalence between the one-sector economy and any balanced multi-sector economy.
+    \vitem As an irrelevance result, it shows that different input-output matrices generate roughly the same volatility for balanced economies.
+  \end{itemize}
+\end{frame}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

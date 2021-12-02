@@ -1,0 +1,163 @@
+\usepackage{lmodern}
+\usepackage{appendixnumberbeamer}
+\renewcommand{\sfdefault}{lmss}
+\renewcommand{\ttdefault}{lmtt}
+\usepackage[T1]{fontenc}
+% \usepackage[utf8]{inputenc}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\theoremstyle{definition}
+\newtheorem*{defn*}{\protect\definitionname}
+\providecommand{\definitionname}{Definition}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{ulem}
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{verbatim}
+\usepackage[english]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage{tikz}
+\usetikzlibrary{arrows,intersections}
+\usepackage{pgfplots}
+\pgfplotsset{compat = 1.15}
+\usepgfplotslibrary{fillbetween}
+\usepackage{verbatim}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{nccmath}
+% \usepackage{listings}
+\usepackage{mathtools}
+
+%Bibliography style, etc.
+% \usepackage[citestyle=authoryear-comp,natbib, uniquename = false, url = false, doi = false, uniquelist=false]{biblatex}
+% \renewbibmacro{in:}{}
+% \AtEveryBibitem{%
+%   \clearfield{volume}%
+%   \clearfield{number}
+%   \clearfield{month}
+%   \clearfield{issn}
+%   \clearfield{isbn}
+%   \clearfield{pages}
+% }
+
+%\usepackage{cleveref}
+\usepackage{setspace}
+\makeatletter
+
+% Macros
+\providecommand{\tabularnewline}{\\}
+\newcommand{\gr}{\textcolor{ForestGreen}} 
+\newcommand{\rd}{\textcolor{red}}
+\newcommand{\cb}{\textcolor{CornflowerBlue}} %this is the blue color you like; simply type \cb{X} where "X" is the color you want in blue
+\newcommand{\vitem}{\vfill \item} %auto-centers items in lists
+\newcommand{\fall}{\ \forall} %redefines "forall" (I don't like the default spacing)
+\newcommand{\frall}{\quad \forall} %a \forall separated from the main math; this is the way it usually shows up in equations
+\newcommand{\exist}{\ \exists} %same as \fall, but for \exists; they have the same ugly spacing
+\newcommand{\R}{\mathbb{R}} %set of real numbers
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}} %different size for cdots
+% \newcommand{\argmax}{\text{arg}\max}
+\newenvironment{itemframe}
+    {\frame{}\itemize}
+    {\itemize\frame}
+\newcommand\makebeamertitle{\frame{\maketitle}}%
+\newtheoremstyle{named}{}{}{\itshape}{}{\bfseries}{.}{.5em}{\thmnote{#3's }#1}
+\theoremstyle{named}
+\newtheorem*{prop*}{Proposition}
+% \newtheorem*{corollary}{Corollary}
+\newtheorem*{namedtheorem}{Theorem} %allows named theorems
+\newtheorem*{nameddef}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem*{assumption}{Assumption}
+\newtheorem*{namedcorollary}{Corollary}
+\newtheorem*{namedlemma}{Lemma}
+\newtheorem*{axiom}{Axiom}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem*{lemma*}{Lemma}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\interior}{int}
+\DeclareMathOperator{\rank}{rank}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcommand{\sbt}{\,\begin{picture}(-1,1)(-1,-3)\circle*{2}\end{picture}\ }
+
+
+
+%formatting
+\usetheme{Ilmenau}
+\definecolor{MIT}{rgb}{.639,.122,.204}
+\definecolor{UCLA}{rgb}{0.15294117647058825, 0.4549019607843137, 0.6823529411764706}
+\definecolor{UCLA_gold}{rgb}{1, 0.8196078431372549, 0}
+\usecolortheme[named=UCLA]{structure}
+\setbeamercolor*{palette secondary}{fg=UCLA_gold,bg=gray!15!white}
+\usecolortheme{dolphin}
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{footline}{}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{navigation symbols}{}
+\mode<presentation> {}
+\setbeamercolor{block title}{use=structure,fg=white,bg=RoyalBlue} %blocks (theorems, etc.)in blue
+\setbeamercolor{block title alerted}{use=structure,fg=white,bg=ForestGreen} %blocks (theorems, etc.)in blue
+
+\renewcommand\qedsymbol{$\blacksquare$} %set QED symbol as black square
+\renewcommand{\emph}{\textit} %set emphasized text style; this is italics
+\setbeamertemplate{footline}[frame number] %slide numbers
+\setbeamertemplate{itemize item}[circle] %bullet style
+\setbeamertemplate{itemize subitem}{--}
+\setbeamertemplate{enumerate item}[default]
+\newrobustcmd*{\parentexttrack}[1]{%
+  \begingroup
+  \blx@blxinit
+  \blx@setsfcodes
+  \blx@bibopenparen#1\blx@bibcloseparen
+  \endgroup}
+
+% \AtEveryCite{%
+%   \let\parentext=\parentexttrack%
+%   \let\bibopenparen=\bibopenbracket%
+%   \let\bibcloseparen=\bibclosebracket}
+
+ \AtBeginDocument{%
+   \let\origtableofcontents=\tableofcontents
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+   \def\gobbletableofcontents#1{\origtableofcontents}
+ }
+\newcommand{\backupbegin}{
+   \newcounter{framenumberappendix}
+   \setcounter{framenumberappendix}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+   \addtocounter{framenumberappendix}{-\value{framenumber}}
+   \addtocounter{framenumber}{\value{framenumberappendix}} 
+} 
+
+\renewcommand{\maketitle}{
+\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+\titlepage
+\end{frame}
+\setbeamertemplate{footline}[frame number]
+}
+
+\usefonttheme[onlymath]{serif}
+
+% \usetheme{CambridgeUS}
+
+% \newtheorem{theorem}{Theorem}
+% \theoremstyle{claim}
+\newtheorem{claim}{Claim}
+% \newtheorem{corollary}{Corollary}
+
+
+\makeatother
+
+
+%\author{Drew Fudenberg}
+
+\institute[]{}
