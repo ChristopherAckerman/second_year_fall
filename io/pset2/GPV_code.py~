@@ -1,0 +1,8 @@
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KernelDensity
+
+my_dir = "/home/chris/files/school/ucla/second_year/fall/io/pset2"
+os.chdir(my_dir)

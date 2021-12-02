@@ -1,0 +1,152 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
+\PYG{k+kn}{import} \PYG{n+nn}{statsmodels.api} \PYG{k}{as} \PYG{n+nn}{sm}
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn.neighbors} \PYG{k+kn}{import} \PYG{n}{KernelDensity}
+
+
+\PYG{k}{def} \PYG{n+nf}{load\PYGZus{}bid\PYGZus{}data}\PYG{p}{(}\PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}PS3Data.csv\PYGZdq{}}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Load problem set data}
+\PYG{l+s+sd}{    Downloaded from http://www.johnasker.com/IO.html}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{df} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}csv}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{df}
+
+
+\PYG{k}{def} \PYG{n+nf}{graph\PYGZus{}bidder\PYGZus{}data}\PYG{p}{(}\PYG{n}{bid\PYGZus{}data}\PYG{o}{=}\PYG{n}{bid\PYGZus{}data}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bidder\PYGZus{}histogram.pdf\PYGZsq{}}\PYG{p}{,} \PYG{n}{n\PYGZus{}bins}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Graph a histogram of bids by each bidder;}
+\PYG{l+s+sd}{    Takes bid data and number of bids as arguments}
+\PYG{l+s+sd}{    Currently hard\PYGZhy{}coded for 2 bidders}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{b1} \PYG{o}{=} \PYG{n}{bid\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}Bidder 1\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+    \PYG{n}{b2} \PYG{o}{=} \PYG{n}{bid\PYGZus{}data}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}Bidder 2\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{values}
+    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{()}
+    \PYG{n}{fig}\PYG{o}{.}\PYG{n}{suptitle}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Histogram of Observed Bids, by bidder\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{b1}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{n}{n\PYGZus{}bins}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Bidder 1\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{b2}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{n}{n\PYGZus{}bins}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Bidder 2\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{frameon}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{,} \PYG{n}{loc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}upper left\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{8}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Bid\PYGZdq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Frequency\PYGZdq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}all\PYGZsq{}}\PYG{p}{)}
+
+    
+\PYG{k}{def} \PYG{n+nf}{graph\PYGZus{}bids}\PYG{p}{(}\PYG{n}{bid\PYGZus{}data}\PYG{o}{=}\PYG{n}{bid\PYGZus{}data}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bid\PYGZus{}density.pdf\PYGZsq{}}\PYG{p}{,} \PYG{n}{bandwidth}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Plot actual bid data for both bidders}
+\PYG{l+s+sd}{    Along with an estimated density of bids}
+\PYG{l+s+sd}{    Using nonparametric density}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{bids} \PYG{o}{=} \PYG{n}{bid\PYGZus{}data}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Auction \PYGZsh{}\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{flatten}\PYG{p}{()}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{()}
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{rng}\PYG{o}{.}\PYG{n}{random\PYGZus{}sample}\PYG{p}{((}\PYG{l+m+mi}{100}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))}
+    \PYG{n}{kde} \PYG{o}{=} \PYG{n}{sm}\PYG{o}{.}\PYG{n}{nonparametric}\PYG{o}{.}\PYG{n}{KDEUnivariate}\PYG{p}{(}\PYG{n}{bids}\PYG{p}{)}
+    \PYG{n}{kde}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{()}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{kde}\PYG{o}{.}\PYG{n}{support}\PYG{p}{,} \PYG{n}{kde}\PYG{o}{.}\PYG{n}{density}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}fitted density\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{fig}\PYG{o}{.}\PYG{n}{suptitle}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Histogram of Observed Bids and Fitted Density\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{18}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{bids}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{,} \PYG{n}{density}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bid data\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{frameon}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{,} \PYG{n}{loc}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}upper left\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Bid\PYGZdq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Density\PYGZdq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}all\PYGZsq{}}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{kernel\PYGZus{}smoothing}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{K}\PYG{p}{,} \PYG{n}{h}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Helper function for GPV algorithm}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{out} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{empty}\PYG{p}{((}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{))} 
+    \PYG{n}{dv} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{prod}\PYG{p}{(}\PYG{n}{h}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{grid}\PYG{p}{:}
+        \PYG{n}{X\PYGZus{}h} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{x} \PYG{o}{\PYGZhy{}} \PYG{n}{X}\PYG{p}{)} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{h}\PYG{p}{)}
+        \PYG{n}{K\PYGZus{}h} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{dv} \PYG{o}{*} \PYG{n}{K}\PYG{p}{(}\PYG{n}{X\PYGZus{}h}\PYG{p}{)}
+        \PYG{n}{est} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{y}\PYG{o}{*}\PYG{n}{K\PYGZus{}h}\PYG{p}{)}
+        \PYG{n}{out} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{vstack}\PYG{p}{((}\PYG{n}{out}\PYG{p}{,} \PYG{n}{est}\PYG{p}{))}
+    \PYG{k}{return} \PYG{n}{out}
+
+
+\PYG{k}{def} \PYG{n+nf}{density\PYGZus{}estimation}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{K}\PYG{p}{,} \PYG{n}{h}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Helper function for GPV algorithm}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{k}{return} \PYG{n}{kernel\PYGZus{}smoothing}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{n}\PYG{p}{),} \PYG{n}{K}\PYG{p}{,} \PYG{n}{h}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{generate\PYGZus{}uniform\PYGZus{}kernel}\PYG{p}{():}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Helper function for GPV algorithm}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{k}{return} \PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{o}{\PYGZlt{}=}\PYG{l+m+mi}{1}\PYG{p}{))}\PYG{o}{.}\PYG{n}{T}\PYG{p}{,} \PYG{n}{ndmin}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{prod}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{bids\PYGZus{}inversion}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{I}\PYG{p}{,} \PYG{n}{G}\PYG{p}{,} \PYG{n}{g}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Invert bids to get valuations}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{k}{return} \PYG{n}{b}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{p}{(}\PYG{n}{I}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{G}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}\PYG{o}{/}\PYG{n}{g}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{estimate\PYGZus{}values\PYGZus{}density}\PYG{p}{(}\PYG{n}{B}\PYG{p}{,} \PYG{n}{kg}\PYG{p}{,} \PYG{n}{hg}\PYG{p}{,} \PYG{n}{rhog}\PYG{p}{,} \PYG{n}{kf}\PYG{p}{,} \PYG{n}{hf}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Estimate the density of valuations}
+\PYG{l+s+sd}{    From observed bid data}
+\PYG{l+s+sd}{    Return estimated density that valuations}
+\PYG{l+s+sd}{    Are drawn from}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{I} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{(}\PYG{n}{B}\PYG{p}{)[}\PYG{l+m+mi}{1}\PYG{p}{]}
+    \PYG{n}{L} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{(}\PYG{n}{B}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+    \PYG{n}{B} \PYG{o}{=} \PYG{n}{B}\PYG{o}{.}\PYG{n}{ravel}\PYG{p}{()}
+    \PYG{n}{G} \PYG{o}{=} \PYG{k}{lambda} \PYG{n}{b}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{B}\PYG{o}{\PYGZlt{}=}\PYG{n}{x}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{n}{L}\PYG{o}{*}\PYG{n}{I}\PYG{p}{)} \PYG{k}{for} \PYG{n}{x} \PYG{o+ow}{in} \PYG{n}{b}\PYG{p}{])}
+    \PYG{n}{g} \PYG{o}{=} \PYG{k}{lambda} \PYG{n}{b}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{density\PYGZus{}estimation}\PYG{p}{(}\PYG{n}{B}\PYG{p}{,} \PYG{n}{kg}\PYG{p}{,} \PYG{n}{hg}\PYG{p}{,} \PYG{n}{b}\PYG{p}{),(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,))}
+    \PYG{n}{V} \PYG{o}{=} \PYG{n}{bids\PYGZus{}inversion}\PYG{p}{(}\PYG{n}{B}\PYG{p}{,} \PYG{n}{I}\PYG{p}{,} \PYG{n}{G}\PYG{p}{,} \PYG{n}{g}\PYG{p}{)}
+    \PYG{n}{c} \PYG{o}{=} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{n}{B}\PYG{p}{)}\PYG{o}{+}\PYG{n}{rhog}\PYG{o}{*}\PYG{n}{hg}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{o}{\PYGZlt{}=}\PYG{n}{B}\PYG{p}{)}\PYG{o}{*}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{B}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{rhog}\PYG{o}{*}\PYG{n}{hg}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{o}{\PYGZgt{}=}\PYG{n}{B}\PYG{p}{)}
+    \PYG{n}{V} \PYG{o}{=} \PYG{n}{V}\PYG{p}{[}\PYG{n}{c}\PYG{p}{]}
+    \PYG{n}{f} \PYG{o}{=} \PYG{n}{density\PYGZus{}estimation}\PYG{p}{(}\PYG{n}{V}\PYG{p}{,} \PYG{n}{kf}\PYG{p}{,} \PYG{n}{hf}\PYG{p}{,} \PYG{n}{grid}\PYG{p}{)}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{size}\PYG{p}{(}\PYG{n}{V}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{n}{I}\PYG{o}{*}\PYG{n}{L}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{f}
+
+
+\PYG{k}{def} \PYG{n+nf}{graph\PYGZus{}estimated\PYGZus{}density}\PYG{p}{(}
+        \PYG{n}{density\PYGZus{}support}\PYG{p}{,}
+        \PYG{n}{estimated\PYGZus{}density}\PYG{o}{=}\PYG{n}{estimated\PYGZus{}density}\PYG{p}{,}
+        \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}estimated\PYGZus{}density.pdf\PYGZsq{}}
+\PYG{p}{):}
+    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{()}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{density\PYGZus{}support}\PYG{p}{,} \PYG{n}{estimated\PYGZus{}density}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}estimated values density\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{bids} \PYG{o}{=} \PYG{n}{bid\PYGZus{}data}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Auction \PYGZsh{}\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{.}\PYG{n}{values}\PYG{o}{.}\PYG{n}{flatten}\PYG{p}{()}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{bids}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{,} \PYG{n}{density}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bid data\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{frameon}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{n}{xlabel}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Bid/Valuation\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{n}{ylabel}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Density\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{fig}\PYG{o}{.}\PYG{n}{suptitle}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Estimated Valuations and Observed Bids\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{22}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}all\PYGZsq{}}\PYG{p}{)}
+
+    
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+    \PYG{n}{my\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}/home/chris/files/school/ucla/second\PYGZus{}year/fall/io/pset2\PYGZdq{}}
+    \PYG{n}{os}\PYG{o}{.}\PYG{n}{chdir}\PYG{p}{(}\PYG{n}{my\PYGZus{}dir}\PYG{p}{)}
+    \PYG{n}{bid\PYGZus{}data} \PYG{o}{=} \PYG{n}{load\PYGZus{}bid\PYGZus{}data}\PYG{p}{(}\PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}PS3Data.csv\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{graph\PYGZus{}bidder\PYGZus{}data}\PYG{p}{(}\PYG{n}{bid\PYGZus{}data}\PYG{o}{=}\PYG{n}{bid\PYGZus{}data}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bidder\PYGZus{}histogram.pdf\PYGZsq{}}\PYG{p}{,} \PYG{n}{n\PYGZus{}bins}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{)}
+    \PYG{n}{graph\PYGZus{}bids}\PYG{p}{(}\PYG{n}{bid\PYGZus{}data}\PYG{o}{=}\PYG{n}{bid\PYGZus{}data}\PYG{p}{,} \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}bid\PYGZus{}density.pdf\PYGZsq{}}\PYG{p}{,} \PYG{n}{bandwidth}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{)}
+    \PYG{n}{density\PYGZus{}support} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{500}\PYG{p}{)}
+    \PYG{n}{estimated\PYGZus{}density} \PYG{o}{=} \PYG{n}{estimate\PYGZus{}values\PYGZus{}density}\PYG{p}{(}
+                                    \PYG{n}{B} \PYG{o}{=} \PYG{n}{bid\PYGZus{}data}\PYG{p}{[[}\PYG{l+s+s1}{\PYGZsq{}Bidder 1\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}Bidder 2\PYGZsq{}}\PYG{p}{]]}\PYG{o}{.}\PYG{n}{to\PYGZus{}numpy}\PYG{p}{()}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{,}
+                                    \PYG{n}{kg} \PYG{o}{=} \PYG{n}{generate\PYGZus{}uniform\PYGZus{}kernel}\PYG{p}{(),}
+                                    \PYG{n}{rhog} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{p}{,}
+                                    \PYG{n}{kf} \PYG{o}{=} \PYG{n}{generate\PYGZus{}uniform\PYGZus{}kernel}\PYG{p}{(),}
+                                    \PYG{n}{hg} \PYG{o}{=} \PYG{l+m+mf}{0.1}\PYG{p}{,}
+                                    \PYG{n}{hf} \PYG{o}{=} \PYG{l+m+mf}{0.1}\PYG{p}{,}
+                                    \PYG{n}{grid} \PYG{o}{=} \PYG{n}{density\PYGZus{}support}
+    \PYG{p}{)}
+    \PYG{n}{graph\PYGZus{}estimated\PYGZus{}density}\PYG{p}{(}
+                            \PYG{n}{density\PYGZus{}support}\PYG{o}{=}\PYG{n}{density\PYGZus{}support}\PYG{p}{,}
+                            \PYG{n}{estimated\PYGZus{}density}\PYG{o}{=}\PYG{n}{estimated\PYGZus{}density}\PYG{p}{,}
+                            \PYG{n}{filename}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}estimated\PYGZus{}density.pdf\PYGZsq{}}
+    \PYG{p}{)}
+\end{Verbatim}

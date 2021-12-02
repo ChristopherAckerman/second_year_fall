@@ -1,0 +1,13 @@
+\documentclass[dvipsnames]{article}
+\usepackage{minted}
+\input{../article_preamble.tex}
+\title{IO Problem Set 2 (GPV)}
+\author{Chris Ackerman\thanks{I worked on this problem set with Luna Shen, David Kerns, and Benedikt Graf}}
+\date{\today}
+
+\begin{document}
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
