@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.11.27)  2 DEC 2021 14:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/Arch Linux) (preloaded format=pdflatex 2021.11.27)  3 DEC 2021 14:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1140,6 +1140,28 @@ Package: setspace 2011/12/19 v6.7a set line spacing
 (/usr/share/texmf-dist/tex/latex/beamer/beamerfontthemeserif.sty)
 \c@claim=\count362
 )
+(/usr/share/texmf-dist/tex/latex/ragged2e/ragged2e.sty
+Package: ragged2e 2021/02/05 v3.0 ragged2e Package
+
+(/usr/share/texmf-dist/tex/latex/everysel/everysel.sty
+Package: everysel 2021/01/20 v2.1 EverySelectfont Package (MS)
+
+(/usr/share/texmf-dist/tex/latex/everysel/everysel-2011-10-28.sty))
+\CenteringLeftskip=\skip73
+\RaggedLeftLeftskip=\skip74
+\RaggedRightLeftskip=\skip75
+\CenteringRightskip=\skip76
+\RaggedLeftRightskip=\skip77
+\RaggedRightRightskip=\skip78
+\CenteringParfillskip=\skip79
+\RaggedLeftParfillskip=\skip80
+\RaggedRightParfillskip=\skip81
+\JustifyingParfillskip=\skip82
+\CenteringParindent=\skip83
+\RaggedLeftParindent=\skip84
+\RaggedRightParindent=\skip85
+\JustifyingParindent=\skip86
+)
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 
@@ -1150,24 +1172,24 @@ File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
 ) (./slides.aux)
 \openout1 = `slides.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 10.
-LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 11.
+LaTeX Font Info:    ... okay on input line 11.
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -1224,7 +1246,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 10.
+Package hyperref Info: Link coloring OFF on input line 11.
 
 (/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
@@ -1237,9 +1259,9 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count370
 )
-LaTeX Info: Redefining \ref on input line 10.
-LaTeX Info: Redefining \pageref on input line 10.
-LaTeX Info: Redefining \nameref on input line 10.
+LaTeX Info: Redefining \ref on input line 11.
+LaTeX Info: Redefining \pageref on input line 11.
+LaTeX Info: Redefining \nameref on input line 11.
 
 (./slides.out) (./slides.out)
 \@outlinefile=\write5
@@ -1276,107 +1298,204 @@ Package caption Info: End \AtBeginDocument code.
 Package pgfplots notification 'compat/show suggested version=true': you might b
 enefit from \pgfplotsset{compat=1.17} (current compat level: 1.15).
 
-(./slides.nav)
+ABD: EverySelectfont initializing macros
+LaTeX Info: Redefining \selectfont on input line 11.
+ (./slides.nav)
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <14.4> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 11.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 12.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 5
-5.
-
-(/usr/share/texmf-dist/tex/latex/lm/ot1lmr.fd
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3
+0.
+ (/usr/share/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 5
-5.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3
+0.
 
 (/usr/share/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-55.
+30.
 
 (/usr/share/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-55.
+30.
 
 (/usr/share/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 55.
+(Font)              <10.95> on input line 30.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 55.
+(Font)              <8> on input line 30.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 55.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 55.
+(Font)              <6> on input line 30.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 30.
 
 
 (/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 55.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 30.
 
 
 (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [2
 
-]
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 83.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 83.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 83.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 83.
- [3
+] [3
 
 ] [4
 
 ] [5
 
-] [6
-
-] [7
-
 ]
-[8
+<1.png, id=51, 245.41687pt x 109.00725pt>
+File: 1.png Graphic file (type png)
+<use 1.png>
+Package pdftex.def Info: 1.png  used on input line 108.
+(pdftex.def)             Requested size: 171.79062pt x 76.30453pt.
+ [6
 
-] [9
+ <./1.png>]
+<2.png, id=57, 135.80737pt x 92.14426pt>
+File: 2.png Graphic file (type png)
+<use 2.png>
+Package pdftex.def Info: 2.png  used on input line 122.
+(pdftex.def)             Requested size: 95.0645pt x 64.50052pt.
+ [7
 
-]
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 188.
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <6> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 188.
- [10
+ <./2.png>]
+<3.png, id=64, 367.67363pt x 355.02638pt>
+File: 3.png Graphic file (type png)
+<use 3.png>
+Package pdftex.def Info: 3.png  used on input line 135.
+(pdftex.def)             Requested size: 147.06683pt x 142.00803pt.
+ [8
+
+ <./3.png>] [9
+
+] [10
 
 ] [11
 
-] [12
+]
+<4.png, id=85, 187.29974pt x 180.675pt>
+File: 4.png Graphic file (type png)
+<use 4.png>
+Package pdftex.def Info: 4.png  used on input line 183.
+(pdftex.def)             Requested size: 112.38069pt x 108.40582pt.
+ [12
+
+ <./4.png>]
+<5.png, id=91, 377.61075pt x 184.89075pt>
+File: 5.png Graphic file (type png)
+<use 5.png>
+Package pdftex.def Info: 5.png  used on input line 200.
+(pdftex.def)             Requested size: 226.56819pt x 110.93529pt.
+ [13
+
+ <./5.png>]
+[14
 
 ]
-Overfull \vbox (8.30756pt too high) detected at line 232
+<7.png, id=105, 369.48038pt x 143.93774pt>
+File: 7.png Graphic file (type png)
+<use 7.png>
+Package pdftex.def Info: 7.png  used on input line 234.
+(pdftex.def)             Requested size: 221.68993pt x 86.3633pt.
+ [15
+
+ <./7.png>]
+<8.png, id=111, 366.77025pt x 162.90863pt>
+File: 8.png Graphic file (type png)
+<use 8.png>
+Package pdftex.def Info: 8.png  used on input line 257.
+(pdftex.def)             Requested size: 183.38467pt x 81.4541pt.
+
+Overfull \vbox (9.0393pt too high) detected at line 257
  []
 
-[13
+[16
 
-] [14
-
-] [15
-
-] [16
-
-] [17
+ <./8.png>] [17
 
 ] [18
 
-] [19
+]
+
+LaTeX Warning: Command \texttimes invalid in math mode on input line 319.
+
+LaTeX Font Info:    Trying to load font information for TS1+lmss on input line 
+319.
+(/usr/share/texmf-dist/tex/latex/lm/ts1lmss.fd
+File: ts1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+
+LaTeX Warning: Command \texttimes invalid in math mode on input line 319.
+
+[19
+
+] [20
+
+] [21
+
+]
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 404.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 404.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 404.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 404.
+ [22
+
+] [23
+
+] [24
+
+] [25
+
+] [26
+
+] [27
+
+] [28
+
+]
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 509.
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <6> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 509.
+ [29
+
+] [30
+
+] [31
+
+]
+Overfull \vbox (8.30756pt too high) detected at line 553
+ []
+
+[32
+
+] [33
+
+] [34
+
+] [35
+
+] [36
+
+] [37
+
+] [38
 
 ]
 \tf@nav=\write6
@@ -1393,13 +1512,13 @@ Package rerunfilecheck Info: File `slides.out' has not changed.
 (rerunfilecheck)             Checksum: CEDC0C521FAE104FBA3B1CA5360A3D8C;68.
  ) 
 Here is how much of TeX's memory you used:
- 38619 strings out of 478994
- 882151 string characters out of 5864750
+ 38873 strings out of 478994
+ 886003 string characters out of 5864750
  1308730 words of memory out of 5000000
- 55279 multiletter control sequences out of 15000+600000
- 459060 words of font info for 72 fonts, out of 8000000 for 9000
+ 55472 multiletter control sequences out of 15000+600000
+ 459430 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 131i,12n,132p,756b,612s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 131i,13n,132p,756b,612s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf-dis
 t/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-mat
 hit.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf-d
@@ -1418,10 +1537,10 @@ fb></usr/share/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf-di
 st/fonts/type1/public/lm/lmsy6.pfb></usr/share/texmf-dist/fonts/type1/public/lm
 /lmsy8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pf
 b>
-Output written on slides.pdf (19 pages, 281622 bytes).
+Output written on slides.pdf (38 pages, 859620 bytes).
 PDF statistics:
- 215 PDF objects out of 1000 (max. 8388607)
- 166 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 500000)
- 57 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 330 PDF objects out of 1000 (max. 8388607)
+ 254 compressed objects within 3 object streams
+ 78 named destinations out of 1000 (max. 500000)
+ 92 words of extra memory for PDF output out of 10000 (max. 10000000)
 
